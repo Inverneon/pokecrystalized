@@ -15,6 +15,7 @@ BattleCommand_Conversion2:
 	push hl
 	dec a
 	ld hl, Moves + MOVE_TYPE
+	and TYPE_MASK
 	call GetMoveAttr
 	ld d, a
 	pop hl
@@ -37,6 +38,7 @@ BattleCommand_Conversion2:
 	ld [hld], a
 	push hl
 	ld a, BATTLE_VARS_MOVE_TYPE
+	and TYPE_MASK
 	call GetBattleVarAddr
 	push af
 	push hl

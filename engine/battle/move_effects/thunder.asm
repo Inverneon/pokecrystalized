@@ -1,5 +1,6 @@
 BattleCommand_ThunderAccuracy:
 	ld a, BATTLE_VARS_MOVE_TYPE
+	and TYPE_MASK
 	call GetBattleVarAddr
 	inc hl
 	ld a, [wBattleWeather]

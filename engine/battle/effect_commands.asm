@@ -1243,6 +1243,7 @@ BattleCommand_Stab:
 .go
 	ld a, BATTLE_VARS_MOVE_TYPE
 	call GetBattleVarAddr
+	and TYPE_MASK
 	ld [wCurType], a
 
 	push hl
@@ -1290,6 +1291,7 @@ BattleCommand_Stab:
 .SkipStab:
 	ld a, BATTLE_VARS_MOVE_TYPE
 	call GetBattleVar
+	and TYPE_MASK
 	ld b, a
 	ld hl, TypeMatchups
 
@@ -1403,7 +1405,8 @@ BattleCheckTypeMatchup:
 	ld hl, wBattleMonType1
 .get_type
 	ld a, BATTLE_VARS_MOVE_TYPE
-	call GetBattleVar ; preserves hl, de, and bc	
+	call GetBattleVar ; preserves hl, de, and bc
+	and TYPE_MASK
 	; fallthrough
 CheckTypeMatchup:
 	push hl
@@ -3038,6 +3041,7 @@ ConfusionDamageCalc:
 	ld b, a
 	ld a, BATTLE_VARS_MOVE_TYPE
 	call GetBattleVar
+	and TYPE_MASK
 	cp b
 	jr nz, .DoneItem
 
@@ -5858,6 +5862,41 @@ BattleCommand_Paralyze:
 	call AnimateFailedMove
 	jp PrintDoesntAffect
 
+CheckMoveTypeMatchesTarget:
+; Compare move type to opponent type.
+; Return z if matching the opponent type,
+; unless the move is Normal (Tri Attack).
+
+	push hl
+
+	ld hl, wEnemyMonType1
+	ldh a, [hBattleTurn]
+	and a
+	jr z, .ok
+	ld hl, wBattleMonType1
+.ok
+
+	ld a, BATTLE_VARS_MOVE_TYPE
+	call GetBattleVar
+	and TYPE_MASK
+	cp NORMAL
+	jr z, .normal
+
+	cp [hl]
+	jr z, .return
+
+	inc hl
+	cp [hl]
+
+.return
+	pop hl
+	ret
+
+.normal
+	ld a, 1
+	and a
+	pop hl
+	ret
 
 INCLUDE "engine/battle/move_effects/substitute.asm"
 
