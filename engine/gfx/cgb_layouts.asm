@@ -243,6 +243,11 @@ _CGB_StatsScreenHPPals:
 	ld a, $5 ; blue page palette
 	call FillBoxCGB
 
+	hlcoord 17, 5, wAttrmap
+	lb bc, 2, 2
+	ld a, $6 ; orange page palette
+	call FillBoxCGB
+
 	call ApplyAttrmap
 	call ApplyPals
 	ld a, TRUE
