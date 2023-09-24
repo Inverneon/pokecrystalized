@@ -277,6 +277,7 @@ NewBarkTownElmsLabSignText:
 
 NewBarkTownElmsHouseSignText:
 	text "ELM'S HOUSE"
+	line " & RELEARNERS"
 	done
 
 NewBarkTown_MapEvents:
