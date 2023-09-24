@@ -1,12 +1,29 @@
 	object_const_def
 	const ELMSHOUSE_ELMS_WIFE
 	const ELMSHOUSE_ELMS_SON
+	const ELMSHOUSE_MOVERELEARNER_F
+	const ELMSHOUSE_EGGMOVERELEARNER_F
 
 ElmsHouse_MapScripts:
 	def_scene_scripts
 
 	def_callbacks
 
+MoveRelearner:
+	faceplayer
+	opentext
+	special MoveReminder
+	waitbutton
+	closetext
+	end
+
+EggMoveRelearner:
+	faceplayer
+	opentext
+	special EggMoveReminder
+	waitbutton
+	closetext
+	end
 ElmsWife:
 	jumptextfaceplayer ElmsWifeText
 
@@ -95,4 +112,6 @@ ElmsHouse_MapEvents:
 
 	def_object_events
 	object_event  1,  5, SPRITE_TEACHER, SPRITEMOVEDATA_WALK_UP_DOWN, 0, 1, -1, -1, PAL_NPC_GREEN, OBJECTTYPE_SCRIPT, 0, ElmsWife, -1
-	object_event  5,  4, SPRITE_BUG_CATCHER, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, ElmsSon, -1
+	object_event  2,  4, SPRITE_BUG_CATCHER, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, ElmsSon, -1
+	object_event  0,  2, SPRITE_COOLTRAINER_F, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, -1, PAL_NPC_BLUE, OBJECTTYPE_SCRIPT, 0, MoveRelearner, -1
+	object_event  5,  4, SPRITE_COOLTRAINER_F, SPRITEMOVEDATA_STANDING_LEFT, 0, 0, -1, -1, PAL_NPC_GREEN, OBJECTTYPE_SCRIPT, 0, EggMoveRelearner, -1
