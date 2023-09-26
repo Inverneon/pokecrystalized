@@ -56,3 +56,24 @@ SubtractAbsolute:: ; unreferenced
 	add 1
 	scf
 	ret
+
+Adjust_percent::
+	; hMultiplicand 
+	; hMultiplier. Result in hProduct.
+	ldh [hMultiplicand], a
+	ld a, 100
+	ldh [hMultiplier], a
+	call Multiply
+	; Divide hDividend length b (max 4 bytes) by hDivisor. Result in hQuotient.
+	; All values are big endian.
+	ld b, 2
+	; ldh a, [hProduct]
+	; ldh [hDividend], a
+	ld a, 255
+	ldh [hDivisor], a
+	call Divide
+	ldh a, [hQuotient + 3]
+	cp 100
+	ret z
+	inc a
+	ret
