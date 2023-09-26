@@ -1,3 +1,88 @@
+	const_def
+	const OW_MOVE_CUT ; 0
+	const OW_MOVE_HEADBUTT ; 1
+	const OW_MOVE_ROCK_SMASH ; 2
+	const OW_MOVE_STRENGTH ; 3
+	const OW_MOVE_SURF ; 4
+	const OW_MOVE_WHIRLPOOL ; 5
+	const OW_MOVE_WATERFALL ; 6
+DEF NUM_OW_MOVES EQU const_value ; 7 
+DEF NO_PARAM_CHECK EQU -1
+EXPORT NO_PARAM_CHECK
+MACRO ow_move
+	db \1 ; actual move ID, cannot be -1/NO_PARAM_CHECK
+	dw \2 ; engine_badge value; or -1 or NO_PARAM_CHECK for no badge check
+	db \3 ; item ID for TM/HM to check for presence in bag, -1 or NO_PARAM_CHECK for no TM/HM in bag check
+	assert \1 != NO_PARAM_CHECK, "A Move ID must be supplied"
+ENDM
+
+InteractableOverworldMoves:
+	table_width 4, InteractableOverworldMoves ; width is 4 because 1 byte for move ID, 2 for engine_badge state, 1 for item/TM/HM ID
+
+	ow_move CUT, 		NO_PARAM_CHECK, 		NO_PARAM_CHECK
+	ow_move HEADBUTT, 	NO_PARAM_CHECK, 		NO_PARAM_CHECK
+	ow_move ROCK_SMASH, NO_PARAM_CHECK, 		NO_PARAM_CHECK
+	; ow_move CUT, 		ENGINE_HIVEBADGE, 		HM_CUT
+	; ow_move HEADBUTT, 	NO_PARAM_CHECK, 		TM_HEADBUTT
+	; ow_move ROCK_SMASH, NO_PARAM_CHECK, 		TM_ROCK_SMASH
+	ow_move STRENGTH, 	ENGINE_PLAINBADGE, 		HM_STRENGTH
+	ow_move SURF, 		ENGINE_FOGBADGE, 		HM_SURF
+	ow_move WHIRLPOOL, 	ENGINE_GLACIERBADGE, 	HM_WHIRLPOOL
+	ow_move WATERFALL, 	ENGINE_RISINGBADGE, 	HM_WATERFALL
+	assert_table_length NUM_OW_MOVES
+	
+TryOWMove:
+	; given index in 'a'
+	add a
+	add a
+	; index * 4 since each entry is 4 bytes
+	ld hl, InteractableOverworldMoves
+	ld d, 0
+	ld e, a
+	add hl, de ; hl is now pointing to ow_move \1, the move ID
+	ld a, [hli]
+	ld [wPutativeTMHMMove], a ; move ID will be safe here and used later
+	ld e, [hl] ; lower half of ow_move \2, engine_badge
+	inc hl
+	ld d, [hl] ; upper half of ow_move \2, engine_badge
+	inc hl     ; hl now pointing to ow_move \3, the TM/HM item if any
+	ld a, NO_PARAM_CHECK ; -1
+	cp e
+	jr nz, .badge_test
+	cp d
+	jr z, .badge_passed	; no badge req
+.badge_test
+	push hl
+	call CheckEngineFlag
+	jr c, .badge_fail
+	pop hl
+.badge_passed
+	ld a, [hl] ; TM/HM associated
+	cp NO_PARAM_CHECK ; -1 ; to see if we should skip this check
+	jr z, .check_learnset
+	ld [wCurItem], a
+	ld hl, wNumItems
+	call CheckItem
+	jr z, .fail
+.check_learnset
+	ld a, [wPutativeTMHMMove]
+	ld d, a
+	call CheckPartyMove
+	and a
+	jr z, .sucess
+	call CheckPartyCanLearnMove
+  	and a
+	jr z, .sucess
+.fail
+	xor a
+	ret
+.sucess
+	ld a, 1
+	ret
+.badge_fail
+	pop hl
+	jr .fail
+
 FieldMoveJumptableReset:
 	xor a
 	ld hl, wFieldMoveData
@@ -63,7 +148,6 @@ CheckBadge:
 
 CheckPartyMove:
 ; Check if a monster in your party has move d.
-
 	ld e, 0
 	xor a
 	ld [wCurPartyMon], a
@@ -105,6 +189,59 @@ CheckPartyMove:
 	scf
 	ret
 
+CheckPartyCanLearnMove:
+; CHECK IF MONSTER IN PARTY CAN LEARN MOVE in 'D' wPutativeTMHMMove
+	xor a
+	ld [wCurPartyMon], a
+.loop
+	ld c, a ; which party slot we're on
+	ld b, 0
+	ld hl, wPartySpecies
+	add hl, bc
+	ld a, [hl] ; current party mon species
+	and a
+	jr z, .no
+	cp -1
+	jr z, .no
+	cp EGG
+	jr z, .next
+
+	ld [wCurPartySpecies], a
+; Check the TM/HM/Move Tutor list
+	predef CanLearnTMHMMove
+.check
+	ld a, c
+	and a
+	jr nz, .yes
+
+; Check the Pokemon's Level-Up Learnset
+	predef CanLearnViaLvlUp
+	ld a, [wNamedObjectIndex]
+	ld c, a
+	ld a, [wPutativeTMHMMove]
+	cp c
+	jr z, .yes
+; Check the Pokemon's Egg Moves
+	predef CanLearnViaEggMove
+	ld a, [wNamedObjectIndex]
+	ld c, a
+	ld a, [wPutativeTMHMMove]
+	cp c
+	jr z, .yes
+
+.next
+	ld a, [wCurPartyMon]
+	inc a
+	ld [wCurPartyMon], a
+	jr .loop
+
+.yes
+	; ; which mon can learn the move is in wCurPartyMon
+	xor a
+	ret
+.no
+	ld a, 1
+	ret
 FieldMoveFailed:
 	ld hl, .CantUseItemText
 	call MenuTextboxBackup
@@ -278,9 +415,9 @@ FlashFunction:
 	ret
 
 .CheckUseFlash:
-	ld de, ENGINE_ZEPHYRBADGE
-	farcall CheckBadge
-	jr c, .nozephyrbadge
+	; ld de, ENGINE_ZEPHYRBADGE
+	; farcall CheckBadge
+	; jr c, .nozephyrbadge
 	push hl
 	farcall SpecialAerodactylChamber
 	pop hl
@@ -298,9 +435,9 @@ FlashFunction:
 	ld a, $80
 	ret
 
-.nozephyrbadge
-	ld a, $80
-	ret
+; .nozephyrbadge
+; 	ld a, $80
+; 	ret
 
 UseFlash:
 	ld hl, Script_UseFlash
@@ -502,13 +639,10 @@ TrySurfOW::
 	call CheckDirection
 	jr c, .quit
 
-	ld de, ENGINE_FOGBADGE
-	call CheckEngineFlag
-	jr c, .quit
-
-	ld d, SURF
-	call CheckPartyMove
-	jr c, .quit
+	ld a, OW_MOVE_SURF ; index for SURF
+	call TryOWMove
+	and a
+	jr z, .quit
 
 	ld hl, wBikeFlags
 	bit BIKEFLAGS_ALWAYS_ON_BIKE_F, [hl]
@@ -557,9 +691,9 @@ FlyFunction:
 	dw .FailFly
 
 .TryFly:
-	ld de, ENGINE_STORMBADGE
-	call CheckBadge
-	jr c, .nostormbadge
+	; ld de, ENGINE_STORMBADGE
+	; call CheckBadge
+	; jr c, .nostormbadge
 	call GetMapEnvironment
 	call CheckOutdoorMap
 	jr z, .outdoors
@@ -582,9 +716,9 @@ FlyFunction:
 	ld a, $1
 	ret
 
-.nostormbadge
-	ld a, $82
-	ret
+; .nostormbadge
+; 	ld a, $82
+; 	ret
 
 .indoors
 	ld a, $2
@@ -703,12 +837,11 @@ Script_UsedWaterfall:
 	text_end
 
 TryWaterfallOW::
-	ld d, WATERFALL
-	call CheckPartyMove
-	jr c, .failed
-	ld de, ENGINE_RISINGBADGE
-	call CheckEngineFlag
-	jr c, .failed
+	ld a, OW_MOVE_WATERFALL ; index for WATERFALL
+	call TryOWMove
+	and a
+	jr z, .failed
+
 	call CheckMapCanWaterfall
 	jr c, .failed
 	ld a, BANK(Script_AskWaterfall)
@@ -887,10 +1020,10 @@ TeleportFunction:
 	dw .FailTeleport
 
 .TryTeleport:
-	call GetMapEnvironment
-	call CheckOutdoorMap
-	jr z, .CheckIfSpawnPoint
-	jr .nope
+	; call GetMapEnvironment
+	; call CheckOutdoorMap
+	; jr z, .CheckIfSpawnPoint
+	; jr .nope
 
 .CheckIfSpawnPoint:
 	ld a, [wLastSpawnMapGroup]
@@ -1054,17 +1187,14 @@ BouldersMayMoveText:
 	text_end
 
 TryStrengthOW:
-	ld d, STRENGTH
-	call CheckPartyMove
-	jr c, .nope
-
-	ld de, ENGINE_PLAINBADGE
-	call CheckEngineFlag
-	jr c, .nope
-
 	ld hl, wBikeFlags
 	bit BIKEFLAGS_STRENGTH_ACTIVE_F, [hl]
 	jr z, .already_using
+
+	ld a, OW_MOVE_STRENGTH ; index for STRENGTH
+	call TryOWMove
+	and a
+	jr z, .nope
 
 	ld a, 2
 	jr .done
@@ -1188,12 +1318,11 @@ DisappearWhirlpool:
 	ret
 
 TryWhirlpoolOW::
-	ld d, WHIRLPOOL
-	call CheckPartyMove
-	jr c, .failed
-	ld de, ENGINE_GLACIERBADGE
-	call CheckEngineFlag
-	jr c, .failed
+	ld a, OW_MOVE_WHIRLPOOL ; index for WHIRLPOOL
+	call TryOWMove
+	and a
+	jr z, .failed
+
 	call TryWhirlpoolMenu
 	jr c, .failed
 	ld a, BANK(Script_AskWhirlpoolOW)
@@ -1283,9 +1412,10 @@ HeadbuttScript:
 	end
 
 TryHeadbuttOW::
-	ld d, HEADBUTT
-	call CheckPartyMove
-	jr c, .no
+	ld a, OW_MOVE_HEADBUTT ; index for HEADBUTT
+	call TryOWMove
+	and a
+	jr z, .no
 
 	ld a, BANK(AskHeadbuttScript)
 	ld hl, AskHeadbuttScript
@@ -1407,9 +1537,10 @@ AskRockSmashText:
 	text_end
 
 HasRockSmash:
-	ld d, ROCK_SMASH
-	call CheckPartyMove
-	jr nc, .yes
+	ld a, OW_MOVE_ROCK_SMASH ; index for ROCK_SMASH
+	call TryOWMove
+	and a
+	jr nz, .yes
 ; no
 	ld a, 1
 	jr .done
@@ -1759,13 +1890,10 @@ GotOffBikeText:
 	text_end
 
 TryCutOW::
-	ld d, CUT
-	call CheckPartyMove
-	jr c, .cant_cut
-
-	ld de, ENGINE_HIVEBADGE
-	call CheckEngineFlag
-	jr c, .cant_cut
+	ld a, OW_MOVE_CUT ; index for CUT
+	call TryOWMove
+	and a
+	jr z, .cant_cut
 
 	ld a, BANK(AskCutScript)
 	ld hl, AskCutScript

@@ -109,6 +109,7 @@ ZubatEggMoves:
 	db FAINT_ATTACK
 	db GUST
 	db WHIRLWIND
+	db FLY
 	db -1 ; end
 
 OddishEggMoves:
@@ -158,6 +159,7 @@ PsyduckEggMoves:
 	db FUTURE_SIGHT
 	db PSYCHIC_M
 	db CROSS_CHOP
+	db TELEPORT
 	db -1 ; end
 
 MankeyEggMoves:
@@ -278,6 +280,7 @@ GastlyEggMoves:
 	db PSYWAVE
 	db PERISH_SONG
 	db HAZE
+	db TELEPORT
 	db -1 ; end
 
 OnixEggMoves:
@@ -288,6 +291,7 @@ OnixEggMoves:
 DrowzeeEggMoves:
 	db LIGHT_SCREEN
 	db BARRIER
+	db TELEPORT
 	db -1 ; end
 
 KrabbyEggMoves:
@@ -304,6 +308,7 @@ ExeggcuteEggMoves:
 	db REFLECT
 	db MEGA_DRAIN
 	db ANCIENTPOWER
+	db TELEPORT
 	db -1 ; end
 
 CuboneEggMoves:
@@ -381,6 +386,7 @@ MrMimeEggMoves:
 	db FUTURE_SIGHT
 	db HYPNOSIS
 	db MIMIC
+	db TELEPORT
 	db -1 ; end
 
 ScytherEggMoves:
@@ -482,6 +488,7 @@ HoothootEggMoves:
 	db WING_ATTACK
 	db WHIRLWIND
 	db SKY_ATTACK
+	db TELEPORT
 	db -1 ; end
 
 LedybaEggMoves:
@@ -519,6 +526,7 @@ CleffaEggMoves:
 	db BELLY_DRUM
 	db SPLASH
 	db MIMIC
+	db TELEPORT
 	db -1 ; end
 
 IgglybuffEggMoves:
@@ -533,6 +541,7 @@ TogepiEggMoves:
 	db PECK
 	db FORESIGHT
 	db FUTURE_SIGHT
+	db TELEPORT
 	db -1 ; end
 
 NatuEggMoves:
@@ -612,6 +621,7 @@ MurkrowEggMoves:
 MisdreavusEggMoves:
 	db SCREECH
 	db DESTINY_BOND
+	db TELEPORT
 	db -1 ; end
 
 GirafarigEggMoves:
@@ -620,6 +630,7 @@ GirafarigEggMoves:
 	db FORESIGHT
 	db FUTURE_SIGHT
 	db BEAT_UP
+	db TELEPORT
 	db -1 ; end
 
 PinecoEggMoves:
