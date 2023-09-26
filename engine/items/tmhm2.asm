@@ -1,4 +1,9 @@
 CanLearnTMHMMove:
+; given:
+; pokemon species in wCurPartySpecies
+; TM/HM/MoveTutor Move in wPutativeTMHMMove
+; clobbers: a, b, c, hl
+; return 0 in c if cannot learn move
 	ld a, [wCurPartySpecies]
 	ld [wCurSpecies], a
 	call GetBaseData

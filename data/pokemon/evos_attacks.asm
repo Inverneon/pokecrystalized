@@ -3345,6 +3345,7 @@ HoOhEvosAttacks:
 
 CelebiEvosAttacks:
 	db 0 ; no more evolutions
+	db 1, TELEPORT
 	db 1, LEECH_SEED
 	db 1, CONFUSION
 	db 1, RECOVER
