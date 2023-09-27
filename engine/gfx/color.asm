@@ -73,6 +73,71 @@ LoadMonBaseTypePal:
 	ld bc, 2
 	jp FarCopyColorWRAM
 
+LoadDexTypePals:
+	; ldh a, [rSVBK]
+	; push af
+	; ld a, BANK(wBGPals1)
+	; ldh [rSVBK], a
+	; ld a, LOW(PALRGB_WHITE)
+	; ld [de], a
+	; inc de
+	; ld a, HIGH(PALRGB_WHITE)
+	; ld [de], a
+	; inc de
+	; pop af
+	; ldh [rSVBK], a
+	ldh a, [rSVBK]
+	push af
+	ld a, BANK(wBGPals1)
+	ldh [rSVBK], a
+	xor a
+	ld [de], a
+	inc de
+	ld [de], a
+	inc de
+	pop af
+	ldh [rSVBK], a	
+
+	ld hl, TypeIconPals
+	ld a, b
+	add a
+	push bc
+	ld c, a
+	ld b, 0
+	add hl, bc
+	ld bc, 2
+	push de
+	call FarCopyColorWRAM
+	pop de
+
+	ld hl, TypeIconPals
+	pop bc
+	ld a, c
+	add a
+	ld c, a
+	ld b, 0
+	add hl, bc
+	inc de
+	inc de
+	ld bc, 2
+	push de
+	call FarCopyColorWRAM
+	pop de
+	inc de
+	inc de
+
+	ldh a, [rSVBK]
+	push af
+	ld a, BANK(wBGPals1)
+	ldh [rSVBK], a
+	xor a
+	ld [de], a
+	inc de
+	ld [de], a
+	inc de
+	pop af
+	ldh [rSVBK], a
+	ret
 LoadSingleBlackPal:
 	; Destination address of the Palette and Slot is passed in 'de'
 	ldh a, [rSVBK]
