@@ -1461,9 +1461,9 @@ JohtoGrassWildMons:
 	def_grass_wildmons ROUTE_37
 	db 10 percent, 10 percent, 10 percent ; encounter rates: morn/day/nite
 	; morn
-	db 13, LEDYBA
-	db 14, GROWLITHE
-	db 15, PIDGEY
+	db 13, TYROGUE
+	db 14, TYROGUE
+	db 15, TYROGUE
 	db 16, GROWLITHE
 	db 15, PIDGEOTTO
 	db 15, LEDIAN

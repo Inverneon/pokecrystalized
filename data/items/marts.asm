@@ -38,7 +38,13 @@ Marts:
 	assert_table_length NUM_MARTS
 
 MartCherrygrove:
+IF DEF(_DEBUG)
+	db 6 ; # items
+	db RARE_CANDY
+	db MASTER_BALL
+ELSE
 	db 4 ; # items
+ENDC
 	db POTION
 	db ANTIDOTE
 	db PARLYZ_HEAL
@@ -46,7 +52,13 @@ MartCherrygrove:
 	db -1 ; end
 
 MartCherrygroveDex:
+IF DEF(_DEBUG)
+	db 7 ; # items
+	db RARE_CANDY
+	db MASTER_BALL
+ELSE
 	db 5 ; # items
+ENDC	
 	db POKE_BALL
 	db POTION
 	db ANTIDOTE
@@ -55,7 +67,13 @@ MartCherrygroveDex:
 	db -1 ; end
 
 MartViolet:
+IF DEF(_DEBUG)
+	db 12 ; # items
+	db RARE_CANDY
+	db MASTER_BALL
+ELSE
 	db 10 ; # items
+ENDC	
 	db POKE_BALL
 	db POTION
 	db ESCAPE_ROPE
@@ -69,7 +87,13 @@ MartViolet:
 	db -1 ; end
 
 MartAzalea:
+IF DEF(_DEBUG)
+	db 11 ; # items
+	db RARE_CANDY
+	db MASTER_BALL
+ELSE
 	db 9 ; # items
+ENDC
 	db CHARCOAL
 	db POKE_BALL
 	db POTION
@@ -82,7 +106,13 @@ MartAzalea:
 	db -1 ; end
 
 MartCianwood:
+IF DEF(_DEBUG)
+	db 7 ; # items
+	db RARE_CANDY
+	db MASTER_BALL
+ELSE
 	db 5 ; # items
+ENDC
 	db POTION
 	db SUPER_POTION
 	db HYPER_POTION
@@ -91,7 +121,13 @@ MartCianwood:
 	db -1 ; end
 
 MartGoldenrod2F1:
+IF DEF(_DEBUG)
+	db 9 ; # items
+	db RARE_CANDY
+	db MASTER_BALL
+ELSE
 	db 7 ; # items
+ENDC
 	db POTION
 	db SUPER_POTION
 	db ANTIDOTE
