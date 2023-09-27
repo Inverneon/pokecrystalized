@@ -95,12 +95,15 @@ SeerAction4:
 	ret
 
 ReadCaughtData:
-	ld a, MON_CAUGHTDATA
+	ld a, MON_CAUGHTDATA ; caught time/ball, caught gender/location, caught level
 	call GetPartyParamLocation
 	ld a, [hli]
 	ld [wSeerCaughtData], a
-	ld a, [hld]
+	ld a, [hli]
 	ld [wSeerCaughtGender], a
+	ld a, [hld]
+	dec hl ; now pointing back at caught time/ball
+	ld [wSeerCaughtLevel], a
 	or [hl]
 	jr z, .error
 
@@ -152,9 +155,8 @@ GetCaughtLevel:
 	call ByteFill
 
 	; caught level
-	; Limited to between 1 and 63 since it's a 6-bit quantity.
-	ld a, [wSeerCaughtData]
-	and CAUGHT_LEVEL_MASK
+	ld a, [wSeerCaughtLevel]
+	and a
 	jr z, .unknown
 	cp CAUGHT_EGG_LEVEL ; egg marker value
 	jr nz, .print
