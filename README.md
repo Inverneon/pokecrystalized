@@ -1,5 +1,14 @@
 # **Nayru's Pokedex Project: BETA PHASE**
 - Branch: ***Nayrus-Pokedex-BETA***
+- Custom Pokemon? Custom changes? Don't want to use a dinky text file to show your players all this information?
+- This Pokedex will read directly from data structures and show the contents.
+- You don't need to do anything besides edit your base stats files, evoatttack, and eggmove tables as you otherwise would when customizing your own version of Crystal. Fully compliant with Fairy Typing.
+
+![image](https://raw.githubusercontent.com/Nayru62/Nayru62-Pokecrystal-Tutorials/main/demos/NayrusPokedex_demo_28SEP2023.gif)
+![image](https://github.com/Nayru62/Nayru62-Pokecrystal-Tutorials/blob/main/demos/area_page_28SEP2023.png)
+![image](https://raw.githubusercontent.com/Nayru62/Nayru62-Pokecrystal-Tutorials/main/demos/evo_page_28SEP2023.png)
+![image](https://raw.githubusercontent.com/Nayru62/Nayru62-Pokecrystal-Tutorials/main/demos/pokegear_28SEP2023.png)
+
 
 *Bundled:* [Idain's](https://github.com/Idain) [Custom Dex Colors](https://github.com/pret/pokecrystal/wiki/Customizable-Pok%C3%A9dex-Color) and [Toggle Shiny Palettes](https://github.com/pret/pokecrystal/wiki/Option-to-show-shiny-colors-in-Pok%C3%A9dex), doesnt impact you if you dont want it.
 
@@ -30,7 +39,9 @@ Feel Free to DM me any suggestions and feedback. If you want to help me design T
 - Pokemon no longer need to have learned the Field Move in order to use it!!!
 - Customizable Badge/TM/HM Requirements to allow for OPEN WORLD!!!
 - [Tutorial](https://github.com/pret/pokecrystal/wiki/Allow-Using-a-Field-Move-if-the-Pokemon-Can-Learn-It)
-![image](https://user-images.githubusercontent.com/110363717/189774794-2f15a7e5-150a-44e0-9704-bd35eb3ff2f8.png) ![image](https://user-images.githubusercontent.com/110363717/189774882-ce9c3f5b-17c2-4e3d-a4de-66a50cb6ed5b.png) *Major rewrite coming soon*
+  
+![image](https://user-images.githubusercontent.com/110363717/189774794-2f15a7e5-150a-44e0-9704-bd35eb3ff2f8.png) ![image](https://user-images.githubusercontent.com/110363717/189774882-ce9c3f5b-17c2-4e3d-a4de-66a50cb6ed5b.png) 
+*Major rewrite coming soon*
 
 ## Gen3-Style Type, Status, and Move Category Tiles, adapted from [Rangi's](https://github.com/Rangi42) [Polished Crystal](https://github.com/Rangi42/polishedcrystal)
 - Branch: ***PC_Gen3_TypeStatusCategory_GFX***
