@@ -322,15 +322,15 @@ ChooseMoveToLearn::
 	dec a
 	push de
 	dec a
-
-IF DEF(TYPE_MASK)
+; print type
 	ld bc, MOVE_LENGTH
 	ld hl, Moves + MOVE_TYPE
 	call AddNTimes
 	ld a, BANK(Moves)
 	call GetFarByte
-	and CATEGORY_MASK
-
+IF DEF(TYPE_MASK)	
+	and TYPE_MASK
+ENDC
 ; bc = a * 4
 	add a
 	add a
@@ -343,26 +343,37 @@ IF DEF(TYPE_MASK)
 	ld hl, wStringBuffer1
 	ld bc, 3
 	call PlaceString
+; printed Type
+; print / in between Type and Category	
 	ld hl, wStringBuffer1 + 3
 	ld [hl], "/"
-
+; print category
 	ld a, [wMenuSelection]
 	dec a
-ENDC
-
 	ld bc, MOVE_LENGTH
 	ld hl, Moves + MOVE_TYPE
 	call AddNTimes
 	ld a, BANK(Moves)
 	call GetFarByte
-    ld [wTempByteValue], a ; ld [wd265], a
+IF DEF(TYPE_MASK)
+	and ~TYPE_MASK
+	swap a
+	srl a
+	srl a
+	dec a
+ELSE
+	ld c, a
+	farcall GetVanillaMoveCategoryIndex
+	ld a, c
+ENDC
 
+	; ld [wTempByteValue], a ; ld [wd265], a
 ; bc = a * 4
 	add a
 	add a
 	ld b, 0
 	ld c, a
-	ld hl, .Types
+	ld hl, .Cats
 	add hl, bc
 	ld d, h
 	ld e, l
@@ -452,7 +463,10 @@ ENDC
 	db "DRG@"
 	db "DRK@"
 	db "FRY@"
-
+.Cats
+	db "PYS@"
+	db "SPC@"
+	db "STS@"
 .PrintMoveDesc
 	push de
 	call SpeechTextbox
