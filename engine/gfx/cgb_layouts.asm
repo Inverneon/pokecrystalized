@@ -298,23 +298,15 @@ _CGB_StatsScreenHPPals:
 	call ByteFill
 
 ; page indicator boxes
-	hlcoord 13, 5, wAttrmap ; If 4th Stats Page implemented use this instead -> hlcoord 11, 5, wAttrmap
+	hlcoord 11, 5, wAttrmap
 	lb bc, 2, 4 ; 2 Tiles in HEIGHT, 4 Tiles in WIDTH
 	ld a, $3 ; pink & green page palette
 	call FillBoxCGB
 
-IF DEF(FSP)
-	; if you have a 4th stats page (FSP)
 	hlcoord 15, 5, wAttrmap
 	lb bc, 2, 4 ; 2 Tiles in HEIGHT, 4 Tiles in WIDTH
 	ld a, $4 ; blue & orange box palette
 	call FillBoxCGB
-ELSE
-	hlcoord 17, 5, wAttrmap
-	lb bc, 2, 2 ; 2 Tiles in HEIGHT, 2 Tiles in WIDTH
-	ld a, $4 ; blue & orange box palette
-	call FillBoxCGB
-ENDC
 
 ; mon status
 	hlcoord 7, 12, wAttrmap
@@ -326,11 +318,6 @@ ENDC
 	hlcoord 5, 14, wAttrmap
 	lb bc, 2, 4 ; 2 Tiles in HEIGHT, 4 Tiles in WIDTH 
 	ld a, $7 ; mon base type light/dark pals
-	call FillBoxCGB
-
-	hlcoord 17, 5, wAttrmap
-	lb bc, 2, 2
-	ld a, $6 ; orange page palette
 	call FillBoxCGB
 
 	call ApplyAttrmap

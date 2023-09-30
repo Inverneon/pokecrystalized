@@ -1191,7 +1191,8 @@ StatsScreen_AnimateEgg:
 	ret
 
 StatsScreen_LoadPageIndicators:
-IF DEF(FSP)
+IF DEF(ORANGE_PAGE)
+
 	hlcoord 11, 5
 	ld a, $42 ; " " " "
 	call .load_square
@@ -1215,7 +1216,8 @@ IF DEF(FSP)
 	hlcoord 15, 5
 	jr z, .load_highlighted_square_alt
 	; must be ORANGE_PAGE
-	hlcoord 17, 5	
+	hlcoord 17, 5
+	; fallthrough to .load_highlighted_square
 ELSE
 	hlcoord 13, 5
 	ld a, $42 ; first of 4 small square tiles
@@ -1236,7 +1238,7 @@ ELSE
 	; can assume cp BLUE_PAGE will be true, no other choices
 	hlcoord 17, 5
 ENDC	
-	jr .load_highlighted_square_alt	
+
 .load_highlighted_square	
 	ld a, $3a ; first of 4 large square tiles
 .load_square
