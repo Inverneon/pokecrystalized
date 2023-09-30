@@ -288,14 +288,20 @@ _CGB_StatsScreenHPPals:
 	call LoadMonBaseTypePal	
 .palettes_done	
 	call WipeAttrmap
-
+; HP
 	hlcoord 0, 0, wAttrmap
 	lb bc, 8, SCREEN_WIDTH
 	ld a, $1 ; mon palette
 	call FillBoxCGB
-
-	hlcoord 10, 16, wAttrmap
+; EXP
+	hlcoord 10, 8, wAttrmap
 	ld bc, 10
+	ld a, $2 ; exp palette
+	call ByteFill
+
+; Heart Icon
+	hlcoord 2, 12, wAttrmap
+	ld bc, 1
 	ld a, $2 ; exp palette
 	call ByteFill
 
@@ -311,13 +317,13 @@ _CGB_StatsScreenHPPals:
 	call FillBoxCGB
 
 ; mon status
-	hlcoord 7, 12, wAttrmap
+	hlcoord 7, 11, wAttrmap
 	lb bc, 1, 2 ; 1 Tile in HEIGHT, 2 Tiles in WIDTH 
 	ld a, $6 ; mon base type light/dark pals
 	call FillBoxCGB
 
 ; mon type(s) 
-	hlcoord 5, 14, wAttrmap
+	hlcoord 5, 13, wAttrmap
 	lb bc, 2, 4 ; 2 Tiles in HEIGHT, 4 Tiles in WIDTH 
 	ld a, $7 ; mon base type light/dark pals
 	call FillBoxCGB

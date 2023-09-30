@@ -553,16 +553,16 @@ StatsScreen_LoadGFX:
 	assert_table_length NUM_STAT_PAGES
 
 LoadPinkPage:
-	hlcoord 0, 9
+	hlcoord 0, 8
 	ld b, $0
 	predef DrawPlayerHP
-	hlcoord 8, 9
+	hlcoord 8, 8
 	ld [hl], $41 ; right HP/exp bar end cap
 	ld de, .Status_Text ; string for "STATUS/"
-	hlcoord 0, 12
+	hlcoord 0, 11
 	call PlaceString
 	ld de, .Type_Text ; string for "TYPE/"
-	hlcoord 0, 14
+	hlcoord 0, 13
 	call PlaceString
 	call PrintMonTypeTiles ; custom GFX function
 
@@ -595,7 +595,7 @@ LoadPinkPage:
 	lb bc, BANK(StatusIconGFX), 2
 	call Request2bpp
 
-	hlcoord 7, 12
+	hlcoord 7, 11
 	ld a, $50 ; status tile first half
 	ld [hli], a
 	inc a ; status tile 2nd half
@@ -604,52 +604,59 @@ LoadPinkPage:
 	jr .done_status
 .HasPokerus:
 	ld de, .PkrsStr
-	hlcoord 1, 13
+	hlcoord 1, 12
 	call PlaceString
 	jr .NotImmuneToPkrs
 .StatusOK:
-	hlcoord 7, 12
+	hlcoord 7, 11
 	ld de, .OK_str
 	call PlaceString
 .done_status
+; vertical divider
 	hlcoord 9, 8
 	ld de, SCREEN_WIDTH
-	ld b, 10
+	ld b, 7
 	ld a, $31 ; vertical divider
 .vertical_divider
 	ld [hl], a
 	add hl, de
 	dec b
 	jr nz, .vertical_divider
+; new horizontal div
+	ld a, $62
+	hlcoord 0, 15
+	ld bc, SCREEN_WIDTH
+	call ByteFill
+; EXP Points
 	ld de, .ExpPointStr
-	hlcoord 10, 9
+	hlcoord 11, 10
 	call PlaceString
-	hlcoord 17, 14
+	hlcoord 14, 13
 	call .PrintNextLevel
-	hlcoord 13, 10
+	hlcoord 12, 11
 	lb bc, 3, 7
 	ld de, wTempMonExp
 	call PrintNum
 	call .CalcExpToNextLevel
-	hlcoord 13, 13
+	hlcoord 12, 14
 	lb bc, 3, 7
 	ld de, wExpToNextLevel
 	call PrintNum
-	ld de, .LevelUpStr
-	hlcoord 10, 12
+	ld de, .ToStr ; .LevelUpStr
+	hlcoord 11, 13
 	call PlaceString
-	ld de, .ToStr
-	hlcoord 14, 14
-	call PlaceString
-	hlcoord 11, 16
+	hlcoord 11, 8
 	ld a, [wTempMonLevel]
 	ld b, a
 	ld de, wTempMonExp + 2
 	predef FillInExpBar
-	hlcoord 10, 16
+	hlcoord 10, 8
 	ld [hl], $40 ; left exp bar end cap
-	hlcoord 19, 16
+	hlcoord 19, 8
 	ld [hl], $41 ; right exp bar end cap
+
+	; this messed up something w/ Type and EXP printing. but not if called here
+	call StatsScreen_PlaceItemName
 	ret
 
 .PrintNextLevel:
@@ -704,10 +711,10 @@ LoadPinkPage:
 	db "OK @"
 
 .ExpPointStr:
-	db "EXP POINTS@"
+	db "EXP PTS@"
 
 .LevelUpStr:
-	db "LEVEL UP@"
+	db "LVL-UP@"
 
 .ToStr:
 	db "TO@"
@@ -716,29 +723,179 @@ LoadPinkPage:
 	db "#RUS@"
 
 LoadGreenPage:
-	ld de, .Item
-	hlcoord 0, 8
-	call PlaceString
-	call .GetItemName
-	hlcoord 8, 8
-	call PlaceString
-	ld de, .Move
-	hlcoord 0, 10
-	call PlaceString
+	call StatsScreen_PlaceOTInfo
+
 	ld hl, wTempMonMoves
 	ld de, wListMoves_MoveIndicesBuffer
 	ld bc, NUM_MOVES
 	call CopyBytes
-	hlcoord 8, 10
+	; hlcoord 1, 8
+	; ld a, SCREEN_WIDTH * 1
+	hlcoord 1, 8
 	ld a, SCREEN_WIDTH * 2
 	ld [wListMovesLineSpacing], a
 	predef ListMoves
-	hlcoord 12, 11
+	; hlcoord 13, 8
+	; ld a, SCREEN_WIDTH * 1	
+	hlcoord 12, 9
 	ld a, SCREEN_WIDTH * 2
+
 	ld [wListMovesLineSpacing], a
 	predef ListMovePP
 	ret
+LoadBluePage:
+	hlcoord 6, 8
+	ld de, .Stats_text
+	call PlaceString
 
+	hlcoord 11, 8
+	ld de, SCREEN_WIDTH
+	ld b, 10
+	ld a, $31 ; vertical divider
+.vertical_divider
+	ld [hl], a
+	add hl, de
+	dec b
+	jr nz, .vertical_divider
+	hlcoord 0, 10
+	ld bc, 8 ; number of spaces after above hlcoord to print the numbers
+	call StatsScreen_Print_Stats
+	call StatsScreen_EVInfo
+	call StatsScreen_PrintDVs
+	ret
+.Stats_text:
+	db "STATS@"
+
+LoadOrangePage:
+	call StatsScreen_placeCaughtLocation
+	call StatsScreen_placeCaughtTime
+	call StatsScreen_placeCaughtLevel
+	call StatsScreen_PrintHappiness
+	call StatsScreen_Print_HiddenPow_Info
+	ret
+
+StatsScreen_Print_Stats:
+; Print wTempMon's stats at hl, with spacing bc.
+	push bc
+	push hl
+	ld de, .StatName_HP
+	call PlaceString
+
+	ld de, .StatName_SPE
+	call .PrintStatText
+
+	ld de, .StatName_ATK
+	call .PrintStatText
+
+	ld de, .StatName_DEF
+	call .PrintStatText
+
+	ld de, .StatName_SPA
+	call .PrintStatText
+
+	ld de, .StatName_SPD
+	call .PrintStatText
+	
+	pop hl
+	pop bc
+	add hl, bc
+	ld de, wTempMonMaxHP
+	lb bc, 2, 3
+	call .PrintStat
+
+	ld de, wTempMonSpeed
+	call .PrintStat
+	ld de, wTempMonAttack
+	call .PrintStat
+	ld de, wTempMonDefense
+	call .PrintStat
+	ld de, wTempMonSpclAtk
+	call .PrintStat
+	ld de, wTempMonSpclDef
+	call .PrintStat
+	ret
+
+.PrintStat:
+	push hl
+	call PrintNum
+	pop hl
+	ld de, SCREEN_WIDTH
+	add hl, de
+	ret
+.PrintStatText:
+	ld bc, SCREEN_WIDTH
+	add hl, bc
+	call PlaceString
+	ret
+
+.StatName_HP:
+	db   "HP@"
+.StatName_SPE:
+	db "SPEED@"	
+.StatName_ATK:
+	db "ATTACK@"
+.StatName_DEF:
+	db "DEFENSE@"
+.StatName_SPA:
+	db "SPCLATK@"
+.StatName_SPD:
+	db "SPCLDEF@"
+
+StatsScreen_EVInfo:
+	hlcoord 13, 8
+	ld de, .EV_text
+	call PlaceString
+	; hlcoord 15, 16
+	; ld de, .EV_Max_text
+	; call PlaceString
+	hlcoord 12, 16
+	ld de, .EV_MaxSingle_text
+	call PlaceString
+
+	
+	hlcoord 13, 10
+	lb bc, 1, 3
+	ld de, wTempMonHPEV
+	call .PrintEV
+
+	ld de, wTempMonSpdEV
+	call .PrintEV
+
+	ld de, wTempMonAtkEV
+	call .PrintEV
+
+	ld de, wTempMonDefEV
+	call .PrintEV
+
+	ld de, wTempMonSpclAtkEV
+	call .PrintEV
+
+	ld de, wTempMonSpclDefEV
+	call .PrintEV
+	ret
+
+.PrintEV:
+	push hl
+	call PrintNum
+	pop hl
+	ld de, SCREEN_WIDTH
+	add hl, de
+	ret
+
+.EV_text:
+	db "EVS DVS@"
+.EV_Max_text:
+	db "/510@"
+.EV_MaxSingle_text:
+	db "/252 /16@"
+
+StatsScreen_PlaceItemName:
+	ld de, .Item
+	hlcoord 0, 16
+	call PlaceString
+	call .GetItemName
+	hlcoord 5, 16
+	call PlaceString
 .GetItemName:
 	ld de, .ThreeDashes
 	ld a, [wTempMonItem]
@@ -749,49 +906,30 @@ LoadGreenPage:
 	ld a, b
 	ld [wNamedObjectIndex], a
 	call GetItemName
+	; ; if we have an item, put icon
+	; hlcoord 5, 16
+	; ld [hl], $4a
 	ret
-
 .Item:
-	db "ITEM@"
-
+	db "ITEM/@"
 .ThreeDashes:
 	db "---@"
-
-.Move:
-	db "MOVE@"
-
-LoadBluePage:
-	call .PlaceOTInfo
-	hlcoord 10, 8
-	ld de, SCREEN_WIDTH
-	ld b, 10
-	ld a, $31 ; vertical divider
-.vertical_divider
-	ld [hl], a
-	add hl, de
-	dec b
-	jr nz, .vertical_divider
-	hlcoord 11, 8
-	ld bc, 6
-	predef PrintTempMonStats
-	ret
-
-.PlaceOTInfo:
+StatsScreen_PlaceOTInfo:
 	ld de, IDNoString
-	hlcoord 0, 9
+	hlcoord 1, 16
 	call PlaceString
-	ld de, OTString
-	hlcoord 0, 12
-	call PlaceString
-	hlcoord 2, 10
+	hlcoord 6, 16
 	lb bc, PRINTNUM_LEADINGZEROS | 2, 5
 	ld de, wTempMonID
 	call PrintNum
+	ld de, OTString
+	hlcoord 1, 17
+	call PlaceString	
 	ld hl, .OTNamePointers
 	call GetNicknamePointer
 	call CopyNickname
 	farcall CorrectNickErrors
-	hlcoord 2, 13
+	hlcoord 6, 17
 	call PlaceString
 	ld a, [wTempMonCaughtGender]
 	and a
@@ -799,11 +937,11 @@ LoadBluePage:
 	cp $7f
 	jr z, .done
 	and CAUGHT_GENDER_MASK
-	ld a, "♂"
+	ld a, "♂" ; $32
 	jr z, .got_gender
-	ld a, "♀"
+	ld a, "♀" ; $33 
 .got_gender
-	hlcoord 9, 13
+	hlcoord 4, 17
 	ld [hl], a
 .done
 	ret
@@ -820,15 +958,10 @@ IDNoString:
 OTString:
 	db "OT/@"
 
-LoadOrangePage:
-	call .placeCaughtLocation
-	ld de, MetAtMapString
+StatsScreen_placeCaughtLocation:
+	ld de, .MetAtMapString
 	hlcoord 1, 9
 	call PlaceString
-	call .placeCaughtLevel
-	ret
-
-.placeCaughtLocation
 	ld a, [wTempMonCaughtLocation]
 	and CAUGHT_LOCATION_MASK
 	jr z, .unknown_location
@@ -841,6 +974,18 @@ LoadOrangePage:
 	ld de, wStringBuffer1
 	hlcoord 2, 10
 	call PlaceString
+	ret	
+.unknown_location:
+	ld de, .MetUnknownMapString
+	hlcoord 2, 10
+	call PlaceString
+	ret
+.MetAtMapString:
+	db "MET: @"
+.MetUnknownMapString:
+	db "UNKNOWN@"
+
+StatsScreen_placeCaughtTime:
 	ld a, [wTempMonCaughtTime]
 	and CAUGHT_TIME_MASK
 	ret z ; no time
@@ -853,22 +998,15 @@ LoadOrangePage:
 	ld e, l
 	call CopyName1
 	ld de, wStringBuffer2
-	hlcoord 2, 11
+	hlcoord 6, 9
 	call PlaceString
 	ret
-
-.unknown_location:
-	ld de, MetUnknownMapString
-	hlcoord 2, 10
-	call PlaceString
-	ret
-
 .times
 	db "MORN@"
 	db "DAY@"
 	db "NITE@"
 
-.placeCaughtLevel
+StatsScreen_placeCaughtLevel:
 	; caught level
 	; Limited to between 1 and 63 since it's a 6-bit quantity.
 	ld a, [wTempMonCaughtLevel]
@@ -880,33 +1018,426 @@ LoadOrangePage:
 
 .print
 	ld [wTextDecimalByte], a
-	hlcoord 3, 13
+	hlcoord 12, 9
 	ld de, wTextDecimalByte
 	lb bc, PRINTNUM_LEFTALIGN | 1, 3
 	call PrintNum
-	ld de, MetAtLevelString
-	hlcoord 1, 12
-	call PlaceString
-	hlcoord 2, 13
+	hlcoord 11, 9
 	ld [hl], "<LV>"
 	ret
 
 .unknown_level
-	ld de, MetUnknownLevelString
-	hlcoord 2, 12
+	ld de, .MetUnknownLevelString
+	hlcoord 11, 9
 	call PlaceString
+	ret   
+.MetUnknownLevelString:
+	db "TRADE@"
+StatsScreen_PrintDVs:
+	; hlcoord 1, 8
+	; ld de, .DVstring1
+	; call PlaceString
+	; hlcoord 1, 9
+	; ld de, .DVstring2
+	; call PlaceString
+	; hlcoord 1, 10
+	; ld de, .DVstring3
+	; call PlaceString
+
+	; we're using wPokedexStatus because why not, nobody using it atm lol
+	; ATK DV
+	ld a, [wTempMonDVs] ; only get the first byte of the word
+	and %11110000 ; most significant nybble of first byte in word-sized wTempMonDVs
+	swap a ; so we can print it properly
+	ld [wPokedexStatus], a
+	ld c, 0
+	; calc HP stat contribution
+	and 1 ; a still has the ATK DV
+	jr z, .atk_not_odd
+	ld a, 0
+	add 8
+	ld b, 0
+	ld c, a
+	;
+.atk_not_odd
+	push bc
+	ld de, wPokedexStatus
+	lb bc,  1, 2 ; bytes, digits
+	hlcoord 18, 12
+	call PrintNum
+
+	; DEF DV
+	ld a, [wTempMonDVs] ; only get the first byte of the word
+	and %00001111 ; least significant nybble, don't need to swap the bits of the byte
+	ld [wPokedexStatus], a ;DEF
+	; calc HP stat contribution
+	pop bc
+	and 1 ; a still has the DEF DV
+	jr z, .def_not_odd
+	ld a, c
+	add 4
+	ld b, 0
+	ld c, a
+	;
+.def_not_odd
+	push bc
+	ld de, wPokedexStatus
+	lb bc,  1, 2
+	hlcoord 18, 13
+	call PrintNum
+
+	; SPE DV
+	ld a, [wTempMonDVs + 1] ; second byte of word
+	and %11110000 ; most significant nybble of 2nd byte in word-sized wTempMonDVs
+	swap a ; so we can print it properly
+	ld [wPokedexStatus], a ;SPEED
+	; calc HP stat contribution
+	pop bc
+	and 1 ; a still has the SPEED DV
+	jr z, .speed_not_odd
+	ld a, c
+	add 2
+	ld b, 0
+	ld c, a
+	;
+.speed_not_odd
+	push bc
+	ld de, wPokedexStatus
+	lb bc,  1, 2 ; bytes, digits
+	hlcoord 18, 11 ; 1, 5, 9, 13
+	call PrintNum
+
+	; SPC DV
+	ld a, [wTempMonDVs + 1] ; second byte of word
+	and %00001111 ; least significant nybble, don't need to swap the bits of the byte
+	ld [wPokedexStatus], a ;SPC
+	; calc HP stat contribution
+	pop bc
+	and 1 ; a still has the DEF DV
+	jr z, .spc_not_odd
+	ld a, c
+	add 1
+	ld b, 0
+	ld c, a
+	;
+.spc_not_odd
+	push bc
+	ld de, wPokedexStatus
+	lb bc, 1, 2 ; bytes, digits
+	hlcoord 18, 14 ; 1, 4, 7, 10, 13 
+	call PrintNum
+	hlcoord 18, 15 ; 1, 4, 7, 10, 13 
+	call PrintNum
+
+	; HP
+	; HP DV is determined by the last bit of each of these four DVs
+	; odd Attack DV adds 8, Defense adds 4, Speed adds 2, and Special adds 1
+	;For example, a Lugia with the DVs 5 Atk, 15 Def, 13 Spe, and 13 Spc will have:
+	; 5 Attack = Odd, HP += 8
+	; 15 Defense = Odd, HP += 4
+	; 13 Speed = Odd, HP += 2
+	; 13 Special = Odd, HP += 1
+	;resulting in an HP stat of 15
+	; THANKS SMOGON
+	; going to "and 1" each final value and push a counter to stack to preserve it
+	pop bc
+	ld a, c
+	ld [wPokedexStatus], a
+	ld de, wPokedexStatus
+	lb bc,  1, 2 ; bytes, digits
+	hlcoord 18, 10 ; 1, 4, 7, 10, 13 
+	call PrintNum
 	ret
 
-MetAtMapString:
-	db "MET AT:@"
+; .DVstring1:
+; 	db "DVS: HP    SPE@"
+; .DVstring2:	
+; 	db "    ATK    DEF@"
+; .DVstring3:
+; 	db "    SPC@"
 
-MetUnknownMapString:
-	db "UNKNOWN@"
+StatsScreen_PrintHappiness:
+	hlcoord 2, 12
+	ld [hl], $34 ; heart icon
+
+	hlcoord 4, 12
+	lb bc, 1, 3
+	ld de, wTempMonHappiness
+	call PrintNum
+	ld de, .outofMaxLoveString
+	hlcoord 7, 12
+	call PlaceString
+	ret
+.outofMaxLoveString:
+	db "/255@"
+
+StatsScreen_LoadUnownFont:
+	ld a, BANK(sScratch)
+	call OpenSRAM
+	ld hl, UnownFont
+	; sScratch + $188 was the address of sDecompressBuffer in pokegold
+	ld de, sScratch + $188
+	ld bc, 38 tiles
+	ld a, BANK(UnownFont)
+	call FarCopyBytes
+	; ld hl, sScratch + $188
+	; ld bc, (NUM_UNOWN + 1) tiles
+	;call Pokedex_InvertTiles
+	ld de, sScratch + $188
+	ld hl, vTiles1 tile $3a ;FIRST_UNOWN_CHAR
+	lb bc, BANK(Pokedex_LoadUnownFont), NUM_UNOWN
+	call Request2bpp
+	call CloseSRAM
+	ret
+StatsScreen_HiddenPow_BP:
+	call StatsScreen_LoadUnownFont
+; Take the top/most significant bit from each stat
+; basically, if the DV is 8 or above
+; arrange those bits in order, into a nybble
+	; Attack
+	ld a, [wTempMonDVs]
+	swap a
+	and %1000
+	; Defense
+	ld b, a
+	ld a, [wTempMonDVs]
+	and %1000
+	srl a
+	or b
+	; Speed
+	ld b, a
+	ld a, [wTempMonDVs + 1]
+	swap a
+	and %1000
+	srl a
+	srl a
+	or b
+	; Special
+	ld b, a
+	ld a, [wTempMonDVs + 1]
+	and %1000
+	srl a
+	srl a
+	srl a
+	or b
+; Multiply by 5
+	ld b, a
+	add a
+	add a
+	add b
+; Add Special & 3
+	ld b, a
+	ld a, [wTempMonDVs + 1]
+	and %0011
+	add b
+; Divide by 2 and add 30 + 1
+	srl a
+	add 30
+	inc a
+	ret
+
+StatsScreen_Print_HiddenPow_Info:
+; print Type first
+	ld a, [wTempMonDVs]
+	and %0011
+	ld b, a
+	; + (Atk & 3) << 2
+	ld a, [wTempMonDVs]
+	and %0011 << 4
+	swap a
+	add a
+	add a
+	or b
+; Skip Normal
+	inc a
+; Skip Bird
+	cp BIRD
+	jr c, .done
+	inc a
+; Skip unused types
+	cp UNUSED_TYPES
+	jr c, .done
+	add UNUSED_TYPES_END - UNUSED_TYPES
+.done
+	add a
+	ld e, a
+	ld d, 0
+	ld a, BANK(TypeNames)
+	ld hl, TypeNames
+	add hl, de
+	call GetFarWord
+	ld d, h
+	ld e, l
+
+	hlcoord 2, 15
+	call PlaceString_UnownFont_Type
 	
-MetAtLevelString:
-	db "MET LEVEL:@"    
-MetUnknownLevelString:
-	db "???@"
+	hlcoord 1, 14
+	ld de, .hidden_pow_text
+	call PlaceString_UnownFont
+
+	call StatsScreen_HiddenPow_BP
+	ld de, .hp_70_text
+	cp 70
+	jr c, .not70
+	ld de, .hp_70_text
+	sub 70
+	jr .print1
+.not70
+	cp 60
+	jr c, .not60
+	ld de, .hp_60_text
+	sub 60
+	jr .print1
+.not60
+	cp 50
+	jr c, .not50
+	ld de, .hp_50_text
+	sub 50
+	jr .print1
+.not50
+	cp 40
+	jr c, .not40
+	ld de, .hp_40_text
+	sub 40
+	jr .print1
+.not40
+	ld de, .hp_30_text
+	sub 30
+.print1
+	hlcoord 3, 16
+	push af
+	call PlaceString_UnownFont
+	pop af
+
+	cp 9
+	jr c, .not9
+	ld de, .hp_9_text
+	jr .print2
+.not9
+	cp 8
+	jr c, .not8
+	ld de, .hp_8_text
+	jr .print2
+.not8
+	cp 7
+	jr c, .not7
+	ld de, .hp_7_text
+	jr .print2
+.not7
+	cp 6
+	jr c, .not6
+	ld de, .hp_6_text
+	jr .print2
+.not6
+	cp 5
+	jr c, .not5
+	ld de, .hp_5_text
+	jr .print2
+.not5
+	cp 4
+	jr c, .not4
+	ld de, .hp_4_text
+	jr .print2
+.not4
+	cp 3
+	jr c, .not3
+	ld de, .hp_3_text
+	jr .print2
+.not3
+	cp 2
+	jr c, .not2
+	ld de, .hp_2_text
+	jr .print2
+.not2
+	cp 1
+	ret c
+	ld de, .hp_1_text
+.print2
+	call PlaceString_UnownFont	
+	ret
+.hidden_pow_text:
+	db "HIDDEN POWER@"
+.hp_70_text:
+	db "SEVENTY@"
+.hp_60_text:
+	db "SIXTY@"
+.hp_50_text:
+	db "FIFTY@"
+.hp_40_text:
+	db "FOURTY@"
+.hp_30_text:
+	db "THIRTY@"
+.hp_1_text:
+	db "-ONE@"
+.hp_2_text:
+	db "-TWO@"
+.hp_3_text:
+	db "-THREE@"
+.hp_4_text:
+	db "-FOUR@"
+.hp_5_text:
+	db "-FIVE@"
+.hp_6_text:
+	db "-SIX@"
+.hp_7_text:
+	db "-SEVEN@"
+.hp_8_text:
+	db "-EIGHT@"
+.hp_9_text:
+	db "-NINE@"
+
+PlaceString_UnownFont_Type:
+	push hl
+	push de
+.loop
+	pop hl
+	ld a, BANK(TypeNames)
+	call GetFarByte
+	ld d, h
+	ld e, l
+	pop hl
+	cp "@"
+	ret z
+	inc de
+	sub "A"
+	add $BA ; FIRST_UNOWN_CHAR
+	ld [hli], a
+	push hl
+	push de
+	jr .loop
+
+PlaceString_UnownFont:
+	push hl
+	push de
+.loop
+	pop hl
+	ld a, [hl]
+	pop hl
+	cp "@"
+	ret z
+	cp " "
+	call z, .skip_space
+	cp "-"
+	call z, .skip_space
+	inc de
+	sub "A"
+	add $BA ; FIRST_UNOWN_CHAR
+	
+	ld [hli], a
+	push hl
+	push de
+	jr .loop	
+.skip_space:
+	ld [hl], a
+	inc hl
+	push hl
+	inc de
+	push de
+	pop hl
+	ld a, [hl]
+	pop hl
+	ret
 
 StatsScreen_PlaceFrontpic:
 	ld hl, wTempMonDVs
@@ -1329,7 +1860,7 @@ PrintMonTypeTiles:
 	call Request2bpp
 
 ; placing the Type1 Tiles (from gfx\stats\types_light.png)
-	hlcoord 5, 14
+	hlcoord 5, 13
 	ld [hl], $4c
 	inc hl
 	ld [hl], $4d
@@ -1359,7 +1890,7 @@ PrintMonTypeTiles:
 	call Request2bpp
 	
 ; place Type 2 GFX
-	hlcoord 5, 15
+	hlcoord 5, 14
 	ld [hl], $5c
 	inc hl
 	ld [hl], $5d
