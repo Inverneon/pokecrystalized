@@ -434,7 +434,7 @@ ListMoves:
 GetMonTypeIndex:
 	; type in 'c', because farcall clobbers 'a'
 	ld a, c
-IF DEF(PSS)	
+IF DEF(TYPE_MASK)	
 	and TYPE_MASK ; Phys/Spec Split only
 ENDC
 
@@ -449,7 +449,7 @@ ENDC
 	ld c, a
 	ret
 
-IF DEF(PSS)
+IF DEF(TYPE_MASK)
 ELSE
 GetVanillaMoveCategoryIndex::
 	ld a, c

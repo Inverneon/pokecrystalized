@@ -5736,7 +5736,7 @@ MoveInfoBox:
 	farcall LoadBattleCategoryAndTypePals
 	call SetPalettes
 	ld a, [wPlayerMoveStruct + MOVE_TYPE]
-IF DEF(PSS)
+IF DEF(TYPE_MASK)
 	and TYPE_MASK
 ENDC	
 	ld c, a ; farcall will clobber a for the bank
@@ -5760,7 +5760,7 @@ ENDC
 	ld [hl], $58
 	; get move category
 	ld a, [wPlayerMoveStruct + MOVE_TYPE]
-IF DEF(PSS)
+IF DEF(TYPE_MASK)
 	and ~TYPE_MASK
 	swap a
 	srl a

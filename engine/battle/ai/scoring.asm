@@ -1366,7 +1366,7 @@ AI_Smart_Counter:
 	jr z, .skipmove
 
 	ld a, [wEnemyMoveStruct + MOVE_TYPE]
-	and CATG_MASK
+	and CATEGORY_MASK
 	cp SPECIAL
 	jr nc, .skipmove
 
@@ -1395,7 +1395,7 @@ AI_Smart_Counter:
 	jr z, .done
 
 	ld a, [wEnemyMoveStruct + MOVE_TYPE]
-	and CATG_MASK
+	and CATEGORY_MASK
 	cp SPECIAL
 	jr nc, .done
 

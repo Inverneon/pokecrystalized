@@ -153,7 +153,7 @@ InitPartyMenuStatusPals:
 
 LoadBattleCategoryAndTypePals:
 	ld a, [wPlayerMoveStruct + MOVE_TYPE]
-IF DEF(PSS)
+IF DEF(TYPE_MASK)
 	and ~TYPE_MASK ; Phys/Spec split only
 	swap a ; Phys/Spec split only
 	srl a ; Phys/Spec split only

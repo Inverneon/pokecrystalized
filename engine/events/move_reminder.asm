@@ -323,9 +323,9 @@ ChooseMoveToLearn::
 	push de
 	dec a
 
-IF DEF(PSS)
+IF DEF(TYPE_MASK)
 	ld bc, MOVE_LENGTH
-	ld hl, Moves + MOVE_CATEGORY
+	ld hl, Moves + MOVE_TYPE
 	call AddNTimes
 	ld a, BANK(Moves)
 	call GetFarByte

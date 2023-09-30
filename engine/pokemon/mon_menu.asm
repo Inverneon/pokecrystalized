@@ -1179,12 +1179,12 @@ PrepareToPlaceMoveData:
 PlaceMoveData:
 	xor a
 	ldh [hBGMapMode], a
-	hlcoord 0, 10
-	ld de, String_MoveType_Top
-	call PlaceString
-	hlcoord 0, 11
-	ld de, String_MoveType_Bottom
-	call PlaceString
+	; hlcoord 0, 10
+	; ld de, String_MoveType_Top
+	; call PlaceString
+	; hlcoord 0, 11
+	; ld de, String_MoveType_Bottom
+	; call PlaceString
 ; Place Move "Atk"/BP String
 	hlcoord 2, 12
 	ld de, String_MoveAtk ; string for "BP"
@@ -1200,7 +1200,7 @@ PlaceMoveData:
 	call GetFarByte
 	push af ; raw Move Type+category Byte, unmasked
 
-IF DEF(PSS)
+IF DEF(TYPE_MASK)
 	and ~TYPE_MASK ; Specific to Phys/Spec split
 	swap a ; Specific to Phys/Spec split
 	srl a  ; Specific to Phys/Spec split
@@ -1230,7 +1230,7 @@ ENDC
 	ld [hl], $5a ; category icon tile 2
 ; Place Move Type
 	pop af ; raw Move Type+category Byte, unmasked if using PSS
-IF DEF(PSS)
+IF DEF(TYPE_MASK)
 	and TYPE_MASK ; Phys/Spec Split specific
 ENDC	
 	ld c, a

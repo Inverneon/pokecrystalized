@@ -1088,7 +1088,7 @@ _CGB_MoveList:
 	call AddNTimes
 	ld a, BANK(Moves)
 	call GetFarByte
-IF DEF(PSS)	
+IF DEF(TYPE_MASK)	
 	and ~TYPE_MASK ; Specific to Phys/Spec split
 	swap a ; Specific to Phys/Spec split
 	srl a  ; Specific to Phys/Spec split
@@ -1118,7 +1118,7 @@ ENDC
 	call AddNTimes
 	ld a, BANK(Moves)
 	call GetFarByte
-IF DEF(PSS)	
+IF DEF(TYPE_MASK)	
 	and TYPE_MASK
 ENDC
 	ld c, a ; farcall will clobber a for the bank
