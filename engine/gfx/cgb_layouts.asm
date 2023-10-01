@@ -263,6 +263,14 @@ _CGB_StatsScreenHPPals:
 	; NOTE: Won't hurt anything if you don't have a 4th stats page, just leave it
 	ld a, BANK(wBGPals1)
 	call FarCopyWRAM
+	; get mon's caught ball index
+	ld hl, wPartyMon1CaughtBall
+	ld bc, PARTYMON_STRUCT_LENGTH
+	ld a, [wCurPartyMon]
+	call AddNTimes ; hl is pointing to the caught ball ptr
+	ld a, [hl]
+	ld c, a
+	call LoadCaughtBallPals
 	call LoadStatsScreenStatusIconPalette
 
 ; Load Pokemon's Type Palette(s)
@@ -327,6 +335,12 @@ _CGB_StatsScreenHPPals:
 	lb bc, 2, 4 ; 2 Tiles in HEIGHT, 4 Tiles in WIDTH 
 	ld a, $7 ; mon base type light/dark pals
 	call FillBoxCGB
+; caught ball
+; 8, 4 or 8, 6
+	hlcoord 8, 6, wAttrmap
+	ld bc, 1
+	ld a, $5 ; palette 5
+	call ByteFill
 
 	call ApplyAttrmap
 	call ApplyPals

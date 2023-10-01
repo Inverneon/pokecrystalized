@@ -205,6 +205,22 @@ SetBoxmonOrEggmonCaughtData:
 	rrca ; shift bit 0 (PLAYERGENDER_FEMALE_F) to bit 7 (CAUGHT_GENDER_MASK)
 	or b
 	ld [hl], a
+; get caught ball
+	ld a, [wCurItem] ; should be the pokeball used to catch
+	ld c, a
+	ld a, NUM_BALL_ITEMS - 1
+	cp c
+	jr nc, .got_ball ; .use_default_ball
+	ld c, PARK_BALL ; default ball for gift mons
+.got_ball
+	ld a, c
+	push af
+	ld a, [wPartyCount]
+	dec a
+	ld hl, wPartyMon1CaughtBall
+	call GetPartyLocation
+	pop af
+	ld [hl], a
 	ret
 
 SetBoxMonCaughtData:

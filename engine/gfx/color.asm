@@ -61,6 +61,27 @@ LoadCPaletteBytesFromHLIntoDE:
 	ldh [rSVBK], a
 	ret
 
+LoadCaughtBallPals:
+	; into pal 5
+	ldh a, [rSVBK]
+	push af
+	ld a, BANK(wBGPals1)
+	ldh [rSVBK], a
+	ld a, c ; caught ball index
+	dec a
+	add a
+	add a ; since each ball palette is 4 bytes
+	ld hl, CaughtBallPals
+	ld b, 0
+	ld c, a
+	add hl, bc
+	; hl is pointing to CaughtBallPals
+	ld de, wBGPals1 palette 5
+	call LoadPalette_White_Col1_Col2_Black
+	pop af
+	ldh [rSVBK], a
+	ret
+
 LoadMonBaseTypePal:
 	; destination address of Palette and Slot is passed in 'de'
 	; Type Index (already fixed/adjusted if a Special Type) is passed in 'c'
@@ -1735,6 +1756,7 @@ SetFirstOBJPalette::
 
 INCLUDE "data/maps/environment_colors.asm"
 INCLUDE "gfx/types_cats_status_pals.asm"
+INCLUDE "gfx/item_palettes.asm"
 PartyMenuBGMobilePalette:
 INCLUDE "gfx/stats/party_menu_bg_mobile.pal"
 
