@@ -215,6 +215,16 @@ _CGB_StatsScreenHPPals:
 	ld bc, 3 palettes ; pink, green, and blue page palettes
 	ld a, BANK(wBGPals1)
 	call FarCopyWRAM
+
+	; get mon's caught ball index
+	ld hl, wPartyMon1CaughtBall
+	ld bc, PARTYMON_STRUCT_LENGTH
+	ld a, [wCurPartyMon]
+	call AddNTimes ; hl is pointing to the caught ball ptr
+	ld a, [hl]
+	ld c, a
+	call LoadCaughtBallPals
+
 	call WipeAttrmap
 
 	hlcoord 0, 0, wAttrmap
@@ -242,6 +252,19 @@ _CGB_StatsScreenHPPals:
 	ld a, $5 ; blue page palette
 	call FillBoxCGB
 
+; caught ball
+	hlcoord 8, 6, wAttrmap
+	ld bc, 1
+	ld a, $7 ; palette 6
+	call ByteFill
+	hlcoord 7, 6, wAttrmap
+	ld bc, 1
+	ld a, $1
+	; set the flipping bits
+	set 5, a; X_FLIP, a
+	; set 6, a ; Y_FLIP, a
+	call ByteFill	
+	
 	call ApplyAttrmap
 	call ApplyPals
 	ld a, TRUE

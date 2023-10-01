@@ -43,6 +43,27 @@ CheckShininess:
 	and a
 	ret
 
+LoadCaughtBallPals:
+	; into pal 7 for vanilla, pal 5 for gen3 custom GFX
+	ldh a, [rSVBK]
+	push af
+	ld a, BANK(wBGPals1)
+	ldh [rSVBK], a
+	ld a, c ; caught ball index
+	dec a
+	add a
+	add a ; since each ball palette is 4 bytes
+	ld hl, CaughtBallPals
+	ld b, 0
+	ld c, a
+	add hl, bc
+	; hl is pointing to CaughtBallPals
+	ld de, wBGPals1 palette 7
+	call LoadPalette_White_Col1_Col2_Black
+	pop af
+	ldh [rSVBK], a
+	ret
+
 Unused_CheckShininess:
 ; Return carry if the DVs at hl are all 10 or higher.
 
@@ -1294,6 +1315,8 @@ endr
 	ret
 
 INCLUDE "data/maps/environment_colors.asm"
+
+INCLUDE "gfx/item_palettes.asm"
 
 PartyMenuBGMobilePalette:
 INCLUDE "gfx/stats/party_menu_bg_mobile.pal"

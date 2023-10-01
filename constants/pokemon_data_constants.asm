@@ -93,7 +93,8 @@ DEF MON_DEF_EV             rb
 DEF MON_SPD_EV             rb
 DEF MON_SAT_EV             rb
 DEF MON_SDF_EV             rb
-                           rb_skip 4
+                           rb_skip 3
+DEF MON_CAUGHT_BALL		   rb
 DEF MON_DVS                rw
 DEF MON_PP                 rb NUM_MOVES
 DEF MON_HAPPINESS          rb

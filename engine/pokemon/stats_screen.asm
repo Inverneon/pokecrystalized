@@ -446,6 +446,7 @@ StatsScreen_InitUpperHalf:
 	call StatsScreen_PlaceHorizontalDivider
 	call StatsScreen_PlacePageSwitchArrows
 	call StatsScreen_PlaceShinyIcon
+	call StatsScreen_placeCaughtBall
 	ret
 
 .PlaceHPBar:
@@ -911,6 +912,62 @@ StatsScreen_placeCaughtLevel:
 	ret   
 .MetUnknownLevelString:
 	db "TRADE@"
+
+StatsScreen_placeCaughtBall:
+	ld a, [wTempMonCaughtBall]
+	; check if above last pokeball in sequence
+	and a
+	ret z
+	ld b, a
+	farcall TimeCapsule_ReplaceTeruSama
+	ld a, b
+	dec a ; pokeball is index 1, but the pokeball GFX index is 0
+	ld hl, CaughtBallsGFX
+	ld bc, 1 * LEN_2BPP_TILE
+	call AddNTimes
+	ld d, h
+	ld e, l
+	lb bc, BANK(CaughtBallsGFX), 1
+	ld hl, vTiles2 tile $70
+	call Request2bpp
+
+	ld de, CaughtBallsBordersGFX
+	lb bc, BANK(CaughtBallsBordersGFX), 3
+	ld hl, vTiles2 tile $75
+	call Request2bpp
+; ball gfx
+	hlcoord 8, 6
+	ld [hl], $70
+; ball borders
+	hlcoord 8, 7
+	ld [hl], $75
+	hlcoord 8, 5
+	ld [hl], $76
+	hlcoord 7, 6
+	ld [hl], $77
+	hlcoord 9, 6
+	ld [hl], $77	
+	
+; Text version instead of GFX icon:
+	;hlcoord 1, 11
+	;ld de, .CaughtBallStr
+	;call PlaceString
+	;ld a, [wTempMonCaughtBall]
+	; check if above last pokeball in sequence
+	;and a
+	;ret z
+	;ld b, a
+	;farcall TimeCapsule_ReplaceTeruSama
+	;ld a, b
+	;ld [wNamedObjectIndex], a
+	;call GetItemName
+	;hlcoord 7, 11
+	;call PlaceString
+	ret
+; .unk_ball_str:
+; 	db "???@"
+; .CaughtBallStr:
+; 	db "BALL: @"
 
 StatsScreen_PlaceFrontpic:
 	ld hl, wTempMonDVs

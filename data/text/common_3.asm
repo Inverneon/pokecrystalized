@@ -479,6 +479,11 @@ _MartHowManyText::
 	text "How many?"
 	done
 
+AlreadyInThatBallTextData::
+	text "Your #mon is in"
+	line "that Ball already."
+	prompt
+
 _MartFinalPriceText::
 	text_decimal wItemQuantityChange, 1, 2
 	text " @"
