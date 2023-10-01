@@ -636,6 +636,14 @@ LoadPinkPage:
 	hlcoord 12, 11
 	lb bc, 3, 7
 	ld de, wTempMonExp
+	ld a, [de]
+	and EXP_MASK
+	ld [wStringBuffer1], a
+	ld a, [wTempMonExp + 1]
+	ld [wStringBuffer1 + 1], a
+	ld a, [wTempMonExp + 2]
+	ld [wStringBuffer1 + 2], a
+	ld de, wStringBuffer1
 	call PrintNum
 	call .CalcExpToNextLevel
 	hlcoord 12, 14
@@ -680,7 +688,6 @@ LoadPinkPage:
 	ld d, a
 	farcall CalcExpAtLevel
 	ld hl, wTempMonExp + 2
-	ld hl, wTempMonExp + 2
 	ldh a, [hQuotient + 3]
 	sub [hl]
 	dec hl
@@ -690,7 +697,14 @@ LoadPinkPage:
 	dec hl
 	ld [wExpToNextLevel + 1], a
 	ldh a, [hQuotient + 1]
-	sbc [hl]
+	push af
+	ld e, a
+	ld a, [hl]
+	and EXP_MASK
+	ld d, a
+	pop af
+	ld a, e
+	sbc d
 	ld [wExpToNextLevel], a
 	ret
 
@@ -988,7 +1002,6 @@ StatsScreen_placeCaughtLocation:
 StatsScreen_placeCaughtTime:
 	ld a, [wTempMonCaughtTime]
 	and CAUGHT_TIME_MASK
-	ret z ; no time
 	rlca
 	rlca
 	dec a
@@ -1008,9 +1021,8 @@ StatsScreen_placeCaughtTime:
 
 StatsScreen_placeCaughtLevel:
 	; caught level
-	; Limited to between 1 and 63 since it's a 6-bit quantity.
 	ld a, [wTempMonCaughtLevel]
-	and CAUGHT_LEVEL_MASK
+	and a
 	jr z, .unknown_level
 	cp CAUGHT_EGG_LEVEL ; egg marker value
 	jr nz, .print

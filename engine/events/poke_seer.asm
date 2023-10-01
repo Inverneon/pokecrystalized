@@ -95,15 +95,19 @@ SeerAction4:
 	ret
 
 ReadCaughtData:
+	ld a, MON_CAUGHTTIME
+	call GetPartyParamLocation
+	ld a , [hl]
+	and CAUGHT_TIME_MASK
+	rlca
+	rlca
+	ld [wSeerCaughtTime], a
 	ld a, MON_CAUGHTDATA ; caught time/ball, caught gender/location, caught level
 	call GetPartyParamLocation
 	ld a, [hli]
-	ld [wSeerCaughtData], a
-	ld a, [hli]
-	ld [wSeerCaughtGender], a
-	ld a, [hld]
-	dec hl ; now pointing back at caught time/ball
 	ld [wSeerCaughtLevel], a
+	ld a, [hld]
+	ld [wSeerCaughtGender], a
 	or [hl]
 	jr z, .error
 
@@ -181,12 +185,10 @@ GetCaughtLevel:
 	db "???@"
 
 GetCaughtTime:
-	ld a, [wSeerCaughtData]
-	and CAUGHT_TIME_MASK
+	ld a, [wSeerCaughtTime]
+	and a
 	jr z, .none
 
-	rlca
-	rlca
 	dec a
 	ld hl, .times
 	call GetNthString
