@@ -633,6 +633,14 @@ LoadPinkPage:
 	hlcoord 13, 10
 	lb bc, 3, 7
 	ld de, wTempMonExp
+	ld a, [de]
+	and EXP_MASK
+	ld [wStringBuffer1], a
+	ld a, [wTempMonExp + 1]
+	ld [wStringBuffer1 + 1], a
+	ld a, [wTempMonExp + 2]
+	ld [wStringBuffer1 + 2], a
+	ld de, wStringBuffer1
 	call PrintNum
 	call .CalcExpToNextLevel
 	hlcoord 13, 13
@@ -677,7 +685,6 @@ LoadPinkPage:
 	ld d, a
 	farcall CalcExpAtLevel
 	ld hl, wTempMonExp + 2
-	ld hl, wTempMonExp + 2
 	ldh a, [hQuotient + 3]
 	sub [hl]
 	dec hl
@@ -687,7 +694,14 @@ LoadPinkPage:
 	dec hl
 	ld [wExpToNextLevel + 1], a
 	ldh a, [hQuotient + 1]
-	sbc [hl]
+	push af
+	ld e, a
+	ld a, [hl]
+	and EXP_MASK
+	ld d, a
+	pop af
+	ld a, e
+	sbc d
 	ld [wExpToNextLevel], a
 	ret
 
@@ -822,6 +836,81 @@ IDNoString:
 
 OTString:
 	db "OT/@"
+
+
+StatsScreen_placeCaughtLocation:
+	ld de, .MetAtMapString
+	hlcoord 1, 9
+	call PlaceString
+	ld a, [wTempMonCaughtLocation]
+	and CAUGHT_LOCATION_MASK
+	jr z, .unknown_location
+	cp LANDMARK_EVENT
+	jr z, .unknown_location
+	cp LANDMARK_GIFT
+	jr z, .unknown_location
+	ld e, a
+	farcall GetLandmarkName
+	ld de, wStringBuffer1
+	hlcoord 2, 10
+	call PlaceString
+	ret	
+.unknown_location:
+	ld de, .MetUnknownMapString
+	hlcoord 2, 10
+	call PlaceString
+	ret
+.MetAtMapString:
+	db "MET: @"
+.MetUnknownMapString:
+	db "UNKNOWN@"
+
+StatsScreen_placeCaughtTime:
+	ld a, [wTempMonCaughtTime]
+	and CAUGHT_TIME_MASK
+	rlca
+	rlca
+	dec a
+	ld hl, .times
+	call GetNthString
+	ld d, h
+	ld e, l
+	call CopyName1
+	ld de, wStringBuffer2
+	hlcoord 6, 9
+	call PlaceString
+	ret
+.times
+	db "MORN@"
+	db "DAY@"
+	db "NITE@"
+
+StatsScreen_placeCaughtLevel:
+	; caught level
+	ld a, [wTempMonCaughtLevel]
+	and a
+	jr z, .unknown_level
+	cp CAUGHT_EGG_LEVEL ; egg marker value
+	jr nz, .print
+	ld a, EGG_LEVEL ; egg hatch level
+
+.print
+	ld [wTextDecimalByte], a
+	hlcoord 12, 9
+	ld de, wTextDecimalByte
+	lb bc, PRINTNUM_LEFTALIGN | 1, 3
+	call PrintNum
+	hlcoord 11, 9
+	ld [hl], "<LV>"
+	ret
+
+.unknown_level
+	ld de, .MetUnknownLevelString
+	hlcoord 11, 9
+	call PlaceString
+	ret   
+.MetUnknownLevelString:
+	db "TRADE@"
 
 StatsScreen_PlaceFrontpic:
 	ld hl, wTempMonDVs
