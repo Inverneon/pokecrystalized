@@ -641,7 +641,7 @@ Pokegear_UpdateClock:
 	db "NITE@"
 	; db "NIGHT@"
 .FishGrpStr:
-	db "FISH:"	
+	db "FISH:@"	
 
 .GearTodayText:
 	text_far _GearTodayText
