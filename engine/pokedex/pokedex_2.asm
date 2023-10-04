@@ -227,27 +227,16 @@ GetDexEntryPointer:
 	ld e, a
 	add hl, de
 	add hl, de
-	ld e, [hl]
-	inc hl
-	ld d, [hl]
-	push de
-	rlca
-	rlca
-	maskbits NUM_DEX_ENTRY_BANKS
-	ld hl, .PokedexEntryBanks
-	ld d, 0
-	ld e, a
 	add hl, de
-	ld b, [hl]
-	pop de
+	; b = bank
+	ld a, [hli]
+	ld b, a
+	; de = address
+	ld a, [hli]
+	ld e, a
+	ld d, [hl]
 	pop hl
 	ret
-
-.PokedexEntryBanks:
-	db BANK("Pokedex Entries 001-064")
-	db BANK("Pokedex Entries 065-128")
-	db BANK("Pokedex Entries 129-192")
-	db BANK("Pokedex Entries 193-251")
 
 GetDexEntryPagePointer:
 	call GetDexEntryPointer
@@ -267,6 +256,7 @@ rept 4
 endr
 ; if c != 1: skip entry
 	dec c
+	and c
 	jr z, .done
 ; skip entry
 .loop2
@@ -275,7 +265,6 @@ endr
 	inc hl
 	cp "@"
 	jr nz, .loop2
-
 .done
 	ld d, h
 	ld e, l
