@@ -1156,7 +1156,7 @@ StatsScreen_Print_HiddenPow_Info:
 	ld de, .hp_30_text
 	sub 30
 .print1
-	hlcoord 13, 15
+	hlcoord 2, 17
 	push af
 	call PlaceString_UnownFont
 	pop af
@@ -1205,11 +1205,11 @@ StatsScreen_Print_HiddenPow_Info:
 	ret c
 	ld de, .hp_1_text
 .print2
-	hlcoord 13, 16
+	; hlcoord 13, 16
 	call PlaceString_UnownFont	
 	ret
 .hidden_pow_text:
-	db "HIDDENPOWER@"
+	db "HIDDEN POWER@"
 .hp_70_text:
 	db "SEVENTY@"
 .hp_60_text:
