@@ -3,6 +3,7 @@ DEF FRUIT_TREE_4     EQU 4
 DEF FRUIT_TREE_5_MAX EQU 5
 
 FruitTreeScript::
+	callasm .PreserveTreeID
 	callasm GetCurTreeFruit
 	opentext
 	readmem wCurFruit
@@ -72,10 +73,12 @@ FruitTreeScript::
 	waitbutton
 	specialsound
 	itemnotify
+	callasm .RestoreTreeID
 	callasm PickedFruitTree
 	sjump .end
 
 .packisfull
+	callasm .RestoreTreeID
 	promptbutton
 	writetext FruitPackIsFullText
 	waitbutton
@@ -90,6 +93,14 @@ FruitTreeScript::
 	farcall LoadItemIconForOverworld
 	farcall LoadItemIconPalette
 	farcall PrintOverworldItemIcon
+	ret
+.PreserveTreeID:
+	ld a, [wCurFruitTree]
+	ld [wStringBuffer5], a
+	ret
+.RestoreTreeID:	
+	ld a, [wStringBuffer5]
+	ld [wCurFruitTree], a
 	ret
 
 GetFruitTreeCount:
@@ -125,7 +136,7 @@ CheckFruitTree:
 	ret
 
 PickedFruitTree:
-	farcall StubbedTrainerRankings_FruitPicked
+	farcall StubbedTrainerRankings_FruitPicked ; for online rankings, increases num of total fruit we've picked
 	ld b, 1
 	jp GetFruitTreeFlag
 
@@ -141,6 +152,7 @@ endr
 	ret
 
 GetFruitTreeFlag:
+	ld b,b
 	push hl
 	push de
 	ld a, [wCurFruitTree]
