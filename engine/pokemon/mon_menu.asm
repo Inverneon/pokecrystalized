@@ -288,6 +288,12 @@ TryGiveItemToPartymon:
 
 .give_item_to_mon
 	call GiveItemToPokemon
+	call GetCurNickname
+	ld hl, wStringBuffer1
+	ld de, wMonOrItemNameBuffer
+	ld bc, MON_NAME_LENGTH
+	call CopyBytes		
+	
 	ld hl, PokemonHoldItemText
 	call MenuTextboxBackup
 	call GivePartyItem
@@ -299,6 +305,14 @@ TryGiveItemToPartymon:
 	ret
 
 .already_holding_item
+	push af
+	call GetCurNickname
+	ld hl, wStringBuffer1
+	ld de, wMonOrItemNameBuffer
+	ld bc, MON_NAME_LENGTH
+	call CopyBytes
+
+	pop af
 	ld [wNamedObjectIndex], a
 	call GetItemName
 	ld hl, PokemonAskSwapItemText

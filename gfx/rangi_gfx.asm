@@ -18,3 +18,5 @@ INCBIN "gfx/stats/types_dark.2bpp"
 
 CaughtBallsGFX::
 INCBIN "gfx/stats/balls.2bpp"
+
+INCLUDE "gfx/items.asm"

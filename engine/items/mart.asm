@@ -142,6 +142,7 @@ GetMart:
 DEF STANDARDMART_EXIT EQU -1
 
 StandardMart:
+	ld b,b
 .loop
 	ld a, [wMartJumptableIndex]
 	ld hl, .MartFunctions

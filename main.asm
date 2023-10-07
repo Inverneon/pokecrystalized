@@ -20,7 +20,6 @@ SECTION "bank2", ROMX
 INCLUDE "engine/overworld/player_object.asm"
 INCLUDE "engine/math/sine.asm"
 INCLUDE "engine/predef.asm"
-INCLUDE "engine/gfx/color.asm"
 
 
 SECTION "bank3", ROMX
@@ -498,6 +497,7 @@ INCLUDE "engine/link/mystery_gift.asm"
 INCLUDE "engine/battle/used_move_text.asm"
 INCLUDE "mobile/mobile_41.asm"
 INCLUDE "engine/gfx/load_overworld_font.asm"
+INCLUDE "engine/gfx/item_icons.asm"
 
 
 SECTION "mobile42", ROMX
@@ -691,12 +691,16 @@ INCBIN "gfx/pokedex/dex_pagenums.2bpp"
 
 SECTION "Map GroupNums Names", ROMX
 INCLUDE "data/maps/map_names.asm"
+
 SECTION "Bank3E Overflow", ROMX
 INCLUDE "engine/link/time_capsule.asm"
 INCLUDE "engine/link/time_capsule_2.asm"
 INCLUDE "engine/events/magikarp.asm"
+
 SECTION "Custom GFX", ROMX
 INCLUDE "gfx/rangi_gfx.asm"
+INCLUDE "engine/gfx/color.asm"
+
 SECTION "Stadium 2 Checksums", ROMX[$7DE0], BANK[$7F]
 
 ; The end of the ROM is taken up by checksums of the content, apparently used

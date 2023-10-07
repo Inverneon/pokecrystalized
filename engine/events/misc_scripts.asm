@@ -12,6 +12,7 @@ FindItemInBallScript::
 	disappear LAST_TALKED
 	opentext
 	writetext .FoundItemText
+	callasm .ShowItemIcon
 	playsound SFX_ITEM
 	pause 60
 	itemnotify
@@ -54,4 +55,22 @@ FindItemInBallScript::
 	ret nc
 	ld a, $1
 	ld [wScriptVar], a
+	ret
+
+.ShowItemIcon:
+	ld a, [wItemBallItemID]
+	cp TM01
+	jr c, .NotTMHM
+	ld c, a
+	callfar GetTMHMNumber
+	ld a, c
+	ld [wTempTMHM], a	
+	predef GetTMHMMove
+	farcall LoadTMHMIconForOverworld
+	ret
+.NotTMHM
+	ld d, a
+	farcall LoadItemIconForOverworld
+	farcall LoadItemIconPalette
+	farcall PrintOverworldItemIcon
 	ret

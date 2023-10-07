@@ -382,6 +382,80 @@ LoadPlayerStatusIconPalette:
 	ld de, wBGPals1 palette 6 + 2 ; slot 2 of pal 6
 	ld bc, 2 ; number of bytes of the color, 2 bytes per slot
 	jp FarCopyColorWRAM
+
+; item icons
+LoadKeyItemIconPalette:
+	ld a, [wCurItem]
+	dec a
+	ld bc, ItemIconPalettes
+	jr LoadIconPalette
+
+LoadKeyItemIconPaletteForOverworld:
+	ld a, [wCurItem]
+	ld bc, ItemIconPalettes
+	jr LoadIconPalette
+
+LoadItemIconPalette::
+	ld a, [wCurSpecies]
+	ld bc, ItemIconPalettes
+LoadIconPalette::
+	dec a
+	ld l, a
+	ld h, 0
+	add hl, hl
+	add hl, hl
+	add hl, bc
+	ld de, wBGPals1 palette 7 + 2
+	ld bc, 4
+	call FarCopyColorWRAM
+	ld hl, BlackPalette
+	ld bc, 2
+	call FarCopyColorWRAM
+	ld hl, WhitePalette
+	ld bc, 2
+	ld de, wBGPals1 palette 7 + 0
+	jp FarCopyColorWRAM
+
+LoadTMHMIconPalette:
+	ld a, [wNamedObjectIndex]
+	ld hl, Moves + MOVE_TYPE
+	dec a
+	ld bc, MOVE_LENGTH
+	call AddNTimes
+	ld a, BANK(Moves)
+	call GetFarByte
+IF DEF(TYPE_MASK)	
+	and TYPE_MASK
+ENDC
+	; TYPE ADJUST: Skip Bird
+	cp BIRD
+	jr c, .type_adjust_done
+	cp UNUSED_TYPES
+	dec a
+	jr c, .type_adjust_done
+	sub UNUSED_TYPES
+.type_adjust_done	
+	ld hl, TMHMTypeIconPals
+	ld c, a
+	ld b, 0
+rept 4
+	add hl, bc
+endr
+	ld de, wBGPals1 palette 7 + 2
+	ld bc, 4
+	call FarCopyColorWRAM
+	ld hl, BlackPalette
+	ld bc, 2
+	call FarCopyColorWRAM
+	ld hl, WhitePalette
+	ld bc, 2
+	ld de, wBGPals1 palette 7 + 0	
+	jp FarCopyColorWRAM
+BlackPalette:
+	RGB 00, 00, 00
+WhitePalette:
+	RGB 31, 31, 31
+
 Unused_CheckShininess:
 ; Return carry if the DVs at hl are all 10 or higher.
 
@@ -413,29 +487,6 @@ Unused_CheckShininess:
 
 .not_shiny
 	and a
-	ret
-
-SGB_ApplyCreditsPals: ; unreferenced
-	push de
-	push bc
-	ld hl, PalPacket_Pal01
-	ld de, wSGBPals
-	ld bc, PALPACKET_LENGTH
-	call CopyBytes
-	pop bc
-	pop de
-	ld a, c
-	ld [wSGBPals + 3], a
-	ld a, b
-	ld [wSGBPals + 4], a
-	ld a, e
-	ld [wSGBPals + 5], a
-	ld a, d
-	ld [wSGBPals + 6], a
-	ld hl, wSGBPals
-	call PushSGBPals
-	ld hl, BlkPacket_AllPal0
-	call PushSGBPals
 	ret
 
 InitPartyMenuPalettes:
@@ -472,105 +523,6 @@ SGB_ApplyPartyMenuHPPals:
 	ld [hl], e
 	ret
 
-Intro_LoadMagikarpPalettes: ; unreferenced
-	call CheckCGB
-	ret z
-
-; CGB only
-	ld hl, .MagikarpBGPal
-	ld de, wBGPals1
-	ld bc, 1 palettes
-	ld a, BANK(wBGPals1)
-	call FarCopyWRAM
-
-	ld hl, .MagikarpOBPal
-	ld de, wOBPals1
-	ld bc, 1 palettes
-	ld a, BANK(wOBPals1)
-	call FarCopyWRAM
-
-	call ApplyPals
-	ld a, TRUE
-	ldh [hCGBPalUpdate], a
-	ret
-
-.MagikarpBGPal:
-INCLUDE "gfx/intro/gs_magikarp_bg.pal"
-
-.MagikarpOBPal:
-INCLUDE "gfx/intro/gs_magikarp_ob.pal"
-
-Intro_LoadAllPal0: ; unreferenced
-	call CheckCGB
-	ret nz
-	ldh a, [hSGB]
-	and a
-	ret z
-	ld hl, BlkPacket_AllPal0
-	jp PushSGBPals
-
-Intro_LoadBetaIntroVenusaurPalettes: ; unreferenced
-	call CheckCGB
-	jr nz, .cgb
-	ldh a, [hSGB]
-	and a
-	ret z
-	ld hl, PalPacket_BetaIntroVenusaur
-	jp PushSGBPals
-
-.cgb
-	ld de, wOBPals1
-	ld a, PREDEFPAL_BETA_INTRO_VENUSAUR
-	call GetPredefPal
-	jp LoadHLPaletteIntoDE
-
-Intro_LoadPackPalettes: ; unreferenced
-	call CheckCGB
-	jr nz, .cgb
-	ldh a, [hSGB]
-	and a
-	ret z
-	ld hl, PalPacket_Pack
-	jp PushSGBPals
-
-.cgb
-	ld de, wOBPals1
-	ld a, PREDEFPAL_PACK
-	call GetPredefPal
-	jp LoadHLPaletteIntoDE
-
-GSIntro_LoadMonPalette: ; unreferenced
-	call CheckCGB
-	jr nz, .cgb
-	ldh a, [hSGB]
-	and a
-	ret z
-	ld a, c
-	push af
-	ld hl, PalPacket_Pal01
-	ld de, wSGBPals
-	ld bc, PALPACKET_LENGTH
-	call CopyBytes
-	pop af
-	call GetMonPalettePointer
-	ld a, [hli]
-	ld [wSGBPals + 3], a
-	ld a, [hli]
-	ld [wSGBPals + 4], a
-	ld a, [hli]
-	ld [wSGBPals + 5], a
-	ld a, [hl]
-	ld [wSGBPals + 6], a
-	ld hl, wSGBPals
-	jp PushSGBPals
-
-.cgb
-	ld de, wOBPals1
-	ld a, c
-	call GetMonPalettePointer
-	call LoadPalette_White_Col1_Col2_Black
-	ret
-
 LoadTrainerClassPaletteAsNthBGPal:
 	ld a, [wTrainerClass]
 	call GetTrainerPalettePointer
@@ -605,36 +557,6 @@ LoadNthMiddleBGPal:
 	ld d, h
 	pop hl
 	call LoadPalette_White_Col1_Col2_Black
-	ret
-
-LoadBetaPokerPalettes: ; unreferenced
-	ldh a, [hCGB]
-	and a
-	jr nz, .cgb
-	ld hl, wBetaPokerSGBPals
-	jp PushSGBPals
-
-.cgb
-	ld a, [wBetaPokerSGBCol]
-	ld c, a
-	ld a, [wBetaPokerSGBRow]
-	hlcoord 0, 0, wAttrmap
-	ld de, SCREEN_WIDTH
-.loop
-	and a
-	jr z, .done
-	add hl, de
-	dec a
-	jr .loop
-
-.done
-	ld b, 0
-	add hl, bc
-	lb bc, 6, 4
-	ld a, [wBetaPokerSGBAttr]
-	and $3
-	call FillBoxCGB
-	call CopyTilemapAtOnce
 	ret
 
 ApplyMonOrTrainerPals:
@@ -1095,51 +1017,8 @@ GetMonPalettePointer:
 	call _GetMonPalettePointer
 	ret
 
-CGBCopyBattleObjectPals: ; unreferenced
-; dummied out
-	ret
-	call CheckCGB
-	ret z
-	ld hl, BattleObjectPals
-	ld a, (1 << rOBPI_AUTO_INCREMENT) | $10
-	ldh [rOBPI], a
-	ld c, 6 palettes
-.loop
-	ld a, [hli]
-	ldh [rOBPD], a
-	dec c
-	jr nz, .loop
-	ld hl, BattleObjectPals
-	ld de, wOBPals1 palette 2
-	ld bc, 2 palettes
-	ld a, BANK(wOBPals1)
-	call FarCopyWRAM
-	ret
-
 BattleObjectPals:
 INCLUDE "gfx/battle_anims/battle_anims.pal"
-
-CGBCopyTwoPredefObjectPals: ; unreferenced
-	call CheckCGB
-	ret z
-	ld a, (1 << rOBPI_AUTO_INCREMENT) | $10
-	ldh [rOBPI], a
-	ld a, PREDEFPAL_TRADE_TUBE
-	call GetPredefPal
-	call .PushPalette
-	ld a, PREDEFPAL_RB_GREENMON
-	call GetPredefPal
-	call .PushPalette
-	ret
-
-.PushPalette:
-	ld c, 1 palettes
-.loop
-	ld a, [hli]
-	ldh [rOBPD], a
-	dec c
-	jr nz, .loop
-	ret
 
 _GetMonPalettePointer:
 	ld l, a
@@ -1331,20 +1210,6 @@ _InitSGBBorderPals:
 	dw DataSndPacket6
 	dw DataSndPacket7
 	dw DataSndPacket8
-
-UpdateSGBBorder: ; unreferenced
-	di
-	xor a
-	ldh [rJOYP], a
-	ld hl, MaskEnFreezePacket
-	call _PushSGBPals
-	call PushSGBBorder
-	call SGBDelayCycles
-	call SGB_ClearVRAM
-	ld hl, MaskEnCancelPacket
-	call _PushSGBPals
-	ei
-	ret
 
 PushSGBBorder:
 	call .LoadSGBBorderPointers
@@ -1756,7 +1621,7 @@ SetFirstOBJPalette::
 
 INCLUDE "data/maps/environment_colors.asm"
 INCLUDE "gfx/types_cats_status_pals.asm"
-INCLUDE "gfx/item_palettes.asm"
+
 PartyMenuBGMobilePalette:
 INCLUDE "gfx/stats/party_menu_bg_mobile.pal"
 
@@ -1780,9 +1645,6 @@ INCLUDE "gfx/diploma/diploma.pal"
 PartyMenuOBPals:
 INCLUDE "gfx/stats/party_menu_ob.pal"
 
-UnusedBattleObjectPals: ; unreferenced
-INCLUDE "gfx/battle_anims/unused_battle_anims.pal"
-
 UnusedGSTitleBGPals:
 INCLUDE "gfx/title/unused_gs_bg.pal"
 
@@ -1796,7 +1658,10 @@ FemalePokegearPals:
 INCLUDE "gfx/pokegear/pokegear_f.pal"
 
 BetaPokerPals:
-INCLUDE "gfx/beta_poker/beta_poker.pal"
+; INCLUDE "gfx/beta_poker/beta_poker.pal"
 
 SlotMachinePals:
 INCLUDE "gfx/slots/slots.pal"
+
+; SECTION "Item Icon Pals", ROMX
+INCLUDE "gfx/item_palettes.asm"

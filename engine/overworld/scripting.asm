@@ -138,7 +138,6 @@ ScriptCommandTable:
 	dw Script_opentext                   ; 47
 	dw Script_refreshscreen              ; 48
 	dw Script_closetext                  ; 49
-	dw Script_writeunusedbyte            ; 4a
 	dw Script_farwritetext               ; 4b
 	dw Script_writetext                  ; 4c
 	dw Script_repeattext                 ; 4d
@@ -470,6 +469,7 @@ GiveItemScript:
 	callasm GiveItemScript_DummyFunction
 	writetext .ReceivedItemText
 	iffalse .Full
+	callasm .ShowItemIcon
 	waitsfx
 	specialsound
 	waitbutton
@@ -484,6 +484,24 @@ GiveItemScript:
 .ReceivedItemText:
 	text_far _ReceivedItemText
 	text_end
+
+.ShowItemIcon:
+	ld a, [wCurItem]
+	cp TM01
+	jr c, .NotTMHM
+	ld c, a
+	callfar GetTMHMNumber
+	ld a, c
+	ld [wTempTMHM], a	
+	predef GetTMHMMove
+	farcall LoadTMHMIconForOverworld
+	ret
+.NotTMHM
+	ld d, a
+	farcall LoadItemIconForOverworld
+	farcall LoadItemIconPalette
+	farcall PrintOverworldItemIcon
+	ret
 
 Script_verbosegiveitemvar:
 	call GetScriptByte
@@ -2174,10 +2192,6 @@ Script_warpcheck:
 	farcall EnableEvents
 	ret
 
-Script_enableevents: ; unreferenced
-	farcall EnableEvents
-	ret
-
 Script_newloadmap:
 	call GetScriptByte
 	ldh [hMapEntryMethod], a
@@ -2198,14 +2212,6 @@ Script_refreshscreen:
 	call RefreshScreen
 	call GetScriptByte
 	ret
-
-Script_writeunusedbyte:
-	call GetScriptByte
-	ld [wUnusedScriptByte], a
-	ret
-
-UnusedClosetextScript: ; unreferenced
-	closetext
 
 Script_closetext:
 	call _OpenAndCloseMenu_HDMATransferTilemapAndAttrmap
@@ -2350,11 +2356,6 @@ Script_wait:
 Script_checksave:
 	farcall CheckSave
 	ld a, c
-	ld [wScriptVar], a
-	ret
-
-Script_checkver_duplicate: ; unreferenced
-	ld a, [.gs_version]
 	ld [wScriptVar], a
 	ret
 

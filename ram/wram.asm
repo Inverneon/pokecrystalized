@@ -1742,7 +1742,8 @@ wVBlankOccurred:: db
 wPredefID:: db
 wPredefHL:: dw
 wPredefAddress:: dw
-wFarCallBC:: dw
+wFarCallBC::
+wFarCallHLBuffer:: dw
 
 wUnusedLinkCommunicationByte:: db
 

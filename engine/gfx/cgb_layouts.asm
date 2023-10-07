@@ -666,28 +666,6 @@ _CGB_BillsPC:
 	ldh [hCGBPalUpdate], a
 	ret
 
-_CGB_Unknown: ; unreferenced
-	ld hl, BillsPCOrangePalette
-	call LoadHLPaletteIntoDE
-	jr .GotPalette
-
-.GetMonPalette: ; unreferenced
-	ld bc, wTempMonDVs
-	call GetPlayerOrMonPalettePointer
-	call LoadPalette_White_Col1_Col2_Black
-.GotPalette:
-	call WipeAttrmap
-	hlcoord 1, 1, wAttrmap
-	lb bc, 7, 7
-	ld a, $1 ; mon palette
-	call FillBoxCGB
-	call InitPartyMenuOBPals
-	call ApplyAttrmap
-	call ApplyPals
-	ld a, TRUE
-	ldh [hCGBPalUpdate], a
-	ret
-
 BillsPCOrangePalette:
 INCLUDE "gfx/pc/orange.pal"
 
@@ -1383,14 +1361,21 @@ _CGB_PackPals:
 	lb bc, 9, 1
 	ld a, $3
 	call FillBoxCGB
-	hlcoord 0, 7, wAttrmap
+	hlcoord 0, 5, wAttrmap
 	lb bc, 3, 5
 	ld a, $4
 	call FillBoxCGB
-	hlcoord 0, 3, wAttrmap
+	hlcoord 0, 1, wAttrmap
 	lb bc, 3, 5
 	ld a, $5
 	call FillBoxCGB
+
+	; item icons
+	hlcoord 1, 8, wAttrmap
+	lb bc, 3, 3
+	ld a, $7
+	call FillBoxCGB
+
 	call ApplyAttrmap
 	call ApplyPals
 	ld a, TRUE
@@ -1553,17 +1538,3 @@ _CGB_MysteryGift:
 
 .MysteryGiftPalettes:
 INCLUDE "gfx/mystery_gift/mystery_gift.pal"
-
-GS_CGB_MysteryGift: ; unreferenced
-	ld hl, .MysteryGiftPalette
-	ld de, wBGPals1
-	ld bc, 1 palettes
-	ld a, BANK(wBGPals1)
-	call FarCopyWRAM
-	call ApplyPals
-	call WipeAttrmap
-	call ApplyAttrmap
-	ret
-
-.MysteryGiftPalette:
-INCLUDE "gfx/mystery_gift/gs_mystery_gift.pal"

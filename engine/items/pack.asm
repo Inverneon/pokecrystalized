@@ -589,6 +589,7 @@ RegisterItem:
 	ret
 
 GiveItem:
+	ld b,b
 	ld a, [wPartyCount]
 	and a
 	jp z, .NoPokemon
@@ -976,6 +977,7 @@ InitPackBuffers:
 	ret
 
 DepositSellInitPackBuffers:
+	ld b,b
 	xor a
 	ldh [hBGMapMode], a
 	ld [wJumptableIndex], a ; PACKSTATE_INITGFX
@@ -988,6 +990,7 @@ DepositSellInitPackBuffers:
 	ret
 
 DepositSellPack:
+	ld b,b
 .loop
 	call .RunJumptable
 	call DepositSellTutorial_InterpretJoypad
@@ -1009,6 +1012,7 @@ DepositSellPack:
 	dw .TMHMPocket
 
 .ItemsPocket:
+	ld b,b
 	xor a ; ITEM_POCKET
 	call InitPocket
 	ld hl, PC_Mart_ItemsPocketMenuHeader
@@ -1191,7 +1195,7 @@ TutorialPack:
 	dbw 0, wDudeNumItems
 	dba PlaceMenuItemName
 	dba PlaceMenuItemQuantity
-	dba UpdateItemDescription
+	dba UpdateItemIconAndDescription
 
 .KeyItems:
 	ld a, KEY_ITEM_POCKET
@@ -1211,7 +1215,7 @@ TutorialPack:
 	dbw 0, wDudeNumKeyItems
 	dba PlaceMenuItemName
 	dba PlaceMenuItemQuantity
-	dba UpdateItemDescription
+	dba UpdateItemIconAndDescription
 
 .TMHM:
 	ld a, TM_HM_POCKET
@@ -1240,7 +1244,7 @@ TutorialPack:
 	dbw 0, wDudeNumBalls
 	dba PlaceMenuItemName
 	dba PlaceMenuItemQuantity
-	dba UpdateItemDescription
+	dba UpdateItemIconAndDescription
 .Berries:
 	ld a, BERRY_POCKET
 	ld hl, .BerriesMenuHeader
@@ -1259,7 +1263,7 @@ TutorialPack:
 	dbw 0, wDudeNumBerries
 	dba PlaceMenuItemName
 	dba PlaceMenuItemQuantity
-	dba UpdateItemDescription
+	dba UpdateItemIconAndDescription
 .DisplayPocket:
 	push hl
 	call InitPocket
@@ -1462,10 +1466,31 @@ Pack_InitGFX:
 	call Textbox
 	call EnableLCD
 	call DrawPackGFX
+	call WaitBGMap
+; placing the item icon!!!
+	hlcoord 1,8
+	; 9 tiles, 3 per row, starting with til $63
+	ld [hl], $60
+	inc hl
+	ld [hl], $61
+	inc hl
+	ld [hl], $62
+	hlcoord 1,9
+	ld [hl], $63
+	inc hl
+	ld [hl], $64
+	inc hl
+	ld [hl], $65
+	hlcoord 1,10
+	ld [hl], $66
+	inc hl
+	ld [hl], $67
+	inc hl
+	ld [hl], $68		
 	ret
 
 PlacePackGFX:
-	hlcoord 0, 3
+	hlcoord 0, 1
 	ld a, $50
 	ld de, SCREEN_WIDTH - 5
 	ld b, 3
@@ -1493,7 +1518,7 @@ DrawPocketName:
 	add hl, de
 	ld d, h
 	ld e, l
-	hlcoord 0, 7
+	hlcoord 0, 5
 	ld c, 3
 .row
 	ld b, 5
@@ -1556,7 +1581,8 @@ ItemsPocketMenuHeader:
 	dbw 0, wNumItems
 	dba PlaceMenuItemName
 	dba PlaceMenuItemQuantity
-	dba UpdateItemDescription
+	dba UpdateItemIconAndDescription
+
 BerryPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
 	menu_coords 7, 1, SCREEN_WIDTH - 1, TEXTBOX_Y - 1
@@ -1570,7 +1596,7 @@ BerryPocketMenuHeader:
 	dbw 0, wNumBerries
 	dba PlaceMenuItemName
 	dba PlaceMenuItemQuantity
-	dba UpdateItemDescription
+	dba UpdateItemIconAndDescription
 
 PC_Mart_BerryPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
@@ -1585,7 +1611,7 @@ PC_Mart_BerryPocketMenuHeader:
 	dbw 0, wNumBerries
 	dba PlaceMenuItemName
 	dba PlaceMenuItemQuantity
-	dba UpdateItemDescription
+	dba UpdateItemIconAndDescription
 	
 PC_Mart_ItemsPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
@@ -1600,7 +1626,7 @@ PC_Mart_ItemsPocketMenuHeader:
 	dbw 0, wNumItems
 	dba PlaceMenuItemName
 	dba PlaceMenuItemQuantity
-	dba UpdateItemDescription
+	dba UpdateItemIconAndDescription
 
 KeyItemsPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
@@ -1615,7 +1641,7 @@ KeyItemsPocketMenuHeader:
 	dbw 0, wNumKeyItems
 	dba PlaceMenuItemName
 	dba PlaceMenuItemQuantity
-	dba UpdateItemDescription
+	dba UpdateItemIconAndDescription
 
 PC_Mart_KeyItemsPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
@@ -1630,7 +1656,7 @@ PC_Mart_KeyItemsPocketMenuHeader:
 	dbw 0, wNumKeyItems
 	dba PlaceMenuItemName
 	dba PlaceMenuItemQuantity
-	dba UpdateItemDescription
+	dba UpdateItemIconAndDescription
 
 BallsPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
@@ -1645,7 +1671,7 @@ BallsPocketMenuHeader:
 	dbw 0, wNumBalls
 	dba PlaceMenuItemName
 	dba PlaceMenuItemQuantity
-	dba UpdateItemDescription
+	dba UpdateItemIconAndDescription
 
 PC_Mart_BallsPocketMenuHeader:
 	db MENU_BACKUP_TILES ; flags
@@ -1660,7 +1686,7 @@ PC_Mart_BallsPocketMenuHeader:
 	dbw 0, wNumBalls
 	dba PlaceMenuItemName
 	dba PlaceMenuItemQuantity
-	dba UpdateItemDescription
+	dba UpdateItemIconAndDescription
 
 PackNoItemText: ; unreferenced
 	text_far _PackNoItemText

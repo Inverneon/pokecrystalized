@@ -252,6 +252,7 @@ TMHM_ShowTMMoveDescription:
 	ld [wCurSpecies], a
 	hlcoord 1, 14
 	call PrintMoveDescription
+	farcall UpdateTMHMIconAndDescription
 	jp TMHM_JoypadLoop
 
 TMHM_ChooseTMorHM:

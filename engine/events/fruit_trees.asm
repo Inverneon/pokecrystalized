@@ -68,9 +68,11 @@ FruitTreeScript::
 	promptbutton	
 	writetext ObtainedFruitText
 .continue
-	callasm PickedFruitTree
+	callasm .ShowApricornIcon
+	waitbutton
 	specialsound
 	itemnotify
+	callasm PickedFruitTree
 	sjump .end
 
 .packisfull
@@ -81,6 +83,14 @@ FruitTreeScript::
 .end
 	closetext
 	end
+
+.ShowApricornIcon:
+	ld a, [wCurFruit]	
+	ld d, a
+	farcall LoadItemIconForOverworld
+	farcall LoadItemIconPalette
+	farcall PrintOverworldItemIcon
+	ret
 
 GetFruitTreeCount:
 ; RandomRange returns a random number between 0 and 2
@@ -100,12 +110,14 @@ GetCurTreeFruit:
 	ret
 
 TryResetFruitTrees:
+	ld b,b
 	ld hl, wDailyFlags1
 	bit DAILYFLAGS1_ALL_FRUIT_TREES_F, [hl]
 	ret nz
 	jp ResetFruitTrees
 
 CheckFruitTree:
+	ld b,b
 	ld b, 2
 	call GetFruitTreeFlag
 	ld a, c
