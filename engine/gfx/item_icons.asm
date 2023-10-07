@@ -8,7 +8,9 @@ UpdateTMHMIconAndDescription::
 	call LoadTMHMIcon
 	jr .ok
 .cancel
-	call ClearTMHMIcon
+	ld a, [wCurItem]
+	call LoadTMHMIcon
+	; call ClearTMHMIcon
 .ok
 	farcall LoadTMHMIconPalette
 	jp SetPalettes
