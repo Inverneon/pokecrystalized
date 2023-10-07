@@ -233,6 +233,8 @@ ItemEffects:
 
 PokeBallEffect:
 	ld a, [wBattleMode]
+	and a ; overworld?
+	jp z, Ball_ReplacePartyMonCaughtBall
 	dec a
 	jp nz, UseBallInTrainerBattle
 
@@ -2707,6 +2709,46 @@ Ball_BoxIsFullMessage:
 	ld [wItemEffectSucceeded], a
 	ret
 
+Ball_ReplacePartyMonCaughtBall:
+	ld b, PARTYMENUACTION_CHOOSE_POKEMON
+	call UseItem_SelectMon
+	jp c, StatusHealer_ExitMenu
+
+	ld a, [wCurPartyMon]
+	ld hl, wPartyMon1CaughtBall
+	call GetPartyLocation
+
+	ld a, [hl]
+	ld b, a
+	ld a, [wCurItem]
+	cp b
+	jr z, AlreadyInThatBallMessage
+	ld [hl], a
+	; call UseDisposableItem
+	ld [wNamedObjectIndex], a
+	call GetItemName
+	call CopyName1 ;  de to wStringBuffer2
+
+	; wStringBuffer2 already contains the item name from GetItemName + CopyName1
+	call GetCurNickname
+	ld hl, BallReplacedText
+	call PrintText
+	call WaitBGMap
+	ret
+
+BallReplacedText:
+	text "Put @"
+	text_ram wStringBuffer1
+	text " in"
+	line "the @"
+	text_ram wStringBuffer2
+	text "."
+	prompt
+
+AlreadyInThatBallMessage:
+	ld hl, AlreadyInThatBallText
+	jr CantUseItemMessage
+
 CantUseOnEggMessage:
 	ld hl, ItemCantUseOnEggText
 	jr CantUseItemMessage
@@ -2718,18 +2760,6 @@ IsntTheTimeMessage:
 WontHaveAnyEffectMessage:
 	ld hl, ItemWontHaveEffectText
 	jr CantUseItemMessage
-
-BelongsToSomeoneElseMessage: ; unreferenced
-	ld hl, ItemBelongsToSomeoneElseText
-	jr CantUseItemMessage
-
-CyclingIsntAllowedMessage: ; unreferenced
-	ld hl, NoCyclingText
-	jr CantUseItemMessage
-
-CantGetOnYourBikeMessage: ; unreferenced
-	ld hl, ItemCantGetOnText
-	; fallthrough
 
 CantUseItemMessage:
 ; Item couldn't be used.
@@ -2743,6 +2773,10 @@ ItemLooksBitterText:
 
 ItemCantUseOnEggText:
 	text_far _ItemCantUseOnEggText
+	text_end
+
+AlreadyInThatBallText:
+	text_far AlreadyInThatBallTextData
 	text_end
 
 ItemOakWarningText:
