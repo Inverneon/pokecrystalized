@@ -28,11 +28,11 @@ MrPokemonsHouseMrPokemonEventScript:
 	writetext MrPokemonIntroText2
 	promptbutton
 	waitsfx
-	giveitem MYSTERY_EGG
-	writetext MrPokemonsHouse_GotEggText
+	verbosegiveitem MYSTERY_EGG
+	; writetext MrPokemonsHouse_GotEggText
 	playsound SFX_KEY_ITEM
 	waitsfx
-	itemnotify
+	; itemnotify
 	setevent EVENT_GOT_MYSTERY_EGG_FROM_MR_POKEMON
 	blackoutmod CHERRYGROVE_CITY
 	writetext MrPokemonIntroText3

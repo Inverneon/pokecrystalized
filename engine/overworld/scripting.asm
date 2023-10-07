@@ -1751,6 +1751,7 @@ Script_giveitem:
 	ld hl, wNumItems
 	call ReceiveItem
 	jr nc, .full
+	call GiveItemScript.ShowItemIcon
 	ld a, TRUE
 	ld [wScriptVar], a
 	ret
