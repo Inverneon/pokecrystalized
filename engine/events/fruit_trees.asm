@@ -121,14 +121,12 @@ GetCurTreeFruit:
 	ret
 
 TryResetFruitTrees:
-	ld b,b
 	ld hl, wDailyFlags1
 	bit DAILYFLAGS1_ALL_FRUIT_TREES_F, [hl]
 	ret nz
 	jp ResetFruitTrees
 
 CheckFruitTree:
-	ld b,b
 	ld b, 2
 	call GetFruitTreeFlag
 	ld a, c
@@ -152,7 +150,6 @@ endr
 	ret
 
 GetFruitTreeFlag:
-	ld b,b
 	push hl
 	push de
 	ld a, [wCurFruitTree]
