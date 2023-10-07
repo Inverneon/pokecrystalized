@@ -142,7 +142,6 @@ GetMart:
 DEF STANDARDMART_EXIT EQU -1
 
 StandardMart:
-	ld b,b
 .loop
 	ld a, [wMartJumptableIndex]
 	ld hl, .MartFunctions
@@ -197,8 +196,40 @@ StandardMart:
 	ret
 
 .Sell:
+	ld hl, wMartPointer
+	ld a, [hli]
+	ld d, [hl]
+	ld e, a
+	ld hl, wStringBuffer4
+	ld [hl], d
+	inc hl
+	ld [hl], e
+	inc hl
+	ld a, [wMartPointerBank]
+	ld [hli], a
+	ld a, [wMartType]
+	ld [hl], a
+
 	call ExitMenu
 	call SellMenu
+
+	ld hl, wStringBuffer4
+	ld a, [hli]
+	ld d, [hl]
+	ld e, a
+	inc hl
+	ld b, [hl]
+	inc hl
+	ld c, [hl]
+	ld hl, wMartPointer
+	ld [hl], d
+	inc hl
+	ld [hl], e
+	ld a, b
+	ld [wMartPointerBank], a
+	ld a, c
+	ld [wMartType], a
+
 	ld a, STANDARDMART_ANYTHINGELSE
 	ret
 

@@ -589,7 +589,6 @@ RegisterItem:
 	ret
 
 GiveItem:
-	ld b,b
 	ld a, [wPartyCount]
 	and a
 	jp z, .NoPokemon
@@ -977,7 +976,6 @@ InitPackBuffers:
 	ret
 
 DepositSellInitPackBuffers:
-	ld b,b
 	xor a
 	ldh [hBGMapMode], a
 	ld [wJumptableIndex], a ; PACKSTATE_INITGFX
@@ -990,7 +988,6 @@ DepositSellInitPackBuffers:
 	ret
 
 DepositSellPack:
-	ld b,b
 .loop
 	call .RunJumptable
 	call DepositSellTutorial_InterpretJoypad
@@ -1012,7 +1009,6 @@ DepositSellPack:
 	dw .TMHMPocket
 
 .ItemsPocket:
-	ld b,b
 	xor a ; ITEM_POCKET
 	call InitPocket
 	ld hl, PC_Mart_ItemsPocketMenuHeader
