@@ -397,6 +397,8 @@ LoadKeyItemIconPaletteForOverworld:
 
 LoadItemIconPalette::
 	ld a, [wCurSpecies]
+	cp $FF
+	jr z, CancelPos_LoadWhitePals
 	ld bc, ItemIconPalettes
 LoadIconPalette::
 	dec a
@@ -414,6 +416,23 @@ LoadIconPalette::
 	ld hl, WhitePalette
 	ld bc, 2
 	ld de, wBGPals1 palette 7 + 0
+	jp FarCopyColorWRAM
+CancelPos_LoadWhitePals:
+	ld hl, WhitePalette
+	ld de, wBGPals1 palette 7
+	ld bc, 2
+	call FarCopyColorWRAM
+	ld hl, WhitePalette
+	ld de, wBGPals1 palette 7 + 2
+	ld bc, 2
+	call FarCopyColorWRAM
+	ld hl, WhitePalette
+	ld de, wBGPals1 palette 7 + 4
+	ld bc, 2
+	call FarCopyColorWRAM
+	ld hl, WhitePalette
+	ld de, wBGPals1 palette 7 + 6
+	ld bc, 2		
 	jp FarCopyColorWRAM
 
 LoadTMHMIconPalette:
