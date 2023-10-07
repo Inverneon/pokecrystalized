@@ -1064,9 +1064,25 @@ StatsScreen_placeCaughtBall:
 	lb bc, BANK(CaughtBallsGFX), 1
 	ld hl, vTiles2 tile $70
 	call Request2bpp
+
+	ld de, CaughtBallsBordersGFX
+	lb bc, BANK(CaughtBallsBordersGFX), 3
+	ld hl, vTiles2 tile $75
+	call Request2bpp
+
 	hlcoord 8, 6
 	ld [hl], $70
 	call WaitBGMap
+
+	hlcoord 8, 7
+	ld [hl], $75
+	hlcoord 8, 5
+	ld [hl], $76
+	hlcoord 7, 6
+	ld [hl], $77
+	hlcoord 9, 6
+	ld [hl], $77	
+	
 	;hlcoord 1, 11
 	;ld de, .CaughtBallStr
 	;call PlaceString

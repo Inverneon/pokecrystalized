@@ -341,7 +341,14 @@ _CGB_StatsScreenHPPals:
 	ld bc, 1
 	ld a, $5 ; palette 5
 	call ByteFill
-
+	hlcoord 7, 6, wAttrmap
+	ld bc, 1
+	ld a, $1
+	; set the flipping bits
+	set 5, a; X_FLIP, a
+	; set 6, a ; Y_FLIP, a
+	call ByteFill	
+	
 	call ApplyAttrmap
 	call ApplyPals
 	ld a, TRUE
