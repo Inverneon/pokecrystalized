@@ -5706,11 +5706,8 @@ MoveInfoBox:
 	farcall LoadBattleCategoryAndTypePals
 	call SetPalettes
 	ld a, [wPlayerMoveStruct + MOVE_TYPE]
-IF DEF(PSS)
-	and TYPE_MASK
-ENDC	
 	ld c, a ; farcall will clobber a for the bank
-	farcall GetMonTypeIndex
+	farcall GetMonTypeIndex ; Automatically adjusts for Physical/Special split if using it
 	ld a, c ; Type Index
 	ld hl, TypeIconGFX ; from gfx\battle\types.png, uses Color 4
 	ld bc, 4 * LEN_1BPP_TILE ; Type GFX is 4 Tiles Wide
@@ -5730,17 +5727,9 @@ ENDC
 	ld [hl], $58
 	; get move category
 	ld a, [wPlayerMoveStruct + MOVE_TYPE]
-IF DEF(PSS)
-	and ~TYPE_MASK
-	swap a
-	srl a
-	srl a
-	dec a
-ELSE
 	ld c, a
-	farcall GetVanillaMoveCategoryIndex
+	farcall GetMoveCategoryIndex
 	ld a, c
-ENDC
 	ld hl, CategoryIconGFX
 	ld bc, 2 tiles ; Move Category is 2 Tiles wide 
 	call AddNTimes

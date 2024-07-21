@@ -302,18 +302,18 @@ _CGB_StatsScreenHPPals:
 	ld a, $3 ; pink & green page palette
 	call FillBoxCGB
 
-IF DEF(FSP)
-	; if you have a 4th stats page (FSP)
-	hlcoord 15, 5, wAttrmap
-	lb bc, 2, 4 ; 2 Tiles in HEIGHT, 4 Tiles in WIDTH
-	ld a, $4 ; blue & orange box palette
-	call FillBoxCGB
-ELSE
+; if you have a 4th stats page (FSP)
+; 	hlcoord 15, 5, wAttrmap
+; 	lb bc, 2, 4 ; 2 Tiles in HEIGHT, 4 Tiles in WIDTH
+; 	ld a, $4 ; blue & orange box palette
+; 	call FillBoxCGB
+; no 4th stats page start
 	hlcoord 17, 5, wAttrmap
 	lb bc, 2, 2 ; 2 Tiles in HEIGHT, 2 Tiles in WIDTH
 	ld a, $4 ; blue & orange box palette
 	call FillBoxCGB
-ENDC
+; no 4th stats page end
+
 
 ; mon status
 	hlcoord 7, 12, wAttrmap
@@ -719,7 +719,7 @@ _CGB_PartyMenu:
 	inc b ; number of Party Mons checked so far, used in various calculations
 	dec c ; number of party mons left to check, stop when 0
 	jr nz, .loop
-	; done with all party pokemon	
+	; done with all party pokemon
 	call ApplyAttrmap
 	ret
 
@@ -932,20 +932,13 @@ _CGB_MoveList:
 	call AddNTimes
 	ld a, BANK(Moves)
 	call GetFarByte
-IF DEF(PSS)	
-	and ~TYPE_MASK ; Specific to Phys/Spec split
-	swap a ; Specific to Phys/Spec split
-	srl a  ; Specific to Phys/Spec split
-	srl a  ; Specific to Phys/Spec split
-	dec a  ; Specific to Phys/Spec split
-ELSE
 	ld c, a
-	farcall GetVanillaMoveCategoryIndex
+	farcall GetMoveCategoryIndex
 	ld a, c
-ENDC	
 	add a ; double the index
 	add a ; quadrouple the index
-	; since entries of CategoryIconPals are 4 bytes (2 colors, 2 bytes each) instead of normal 2 bytes (1 color) 
+; since entries of CategoryIconPals are 4 bytes (2 colors, 2 bytes each) 
+; instead of normal 2 bytes (1 color) 
 	ld hl, CategoryIconPals
 	ld c, a
 	ld b, 0
@@ -962,14 +955,12 @@ ENDC
 	call AddNTimes
 	ld a, BANK(Moves)
 	call GetFarByte
-IF DEF(PSS)	
-	and TYPE_MASK
-ENDC
 	ld c, a ; farcall will clobber a for the bank
 	farcall GetMonTypeIndex
 	ld a, c
 	ld hl, TypeIconPals
-	add a ; double the index, entries of TypeIconPals are 2 bytes (1 color). Same as a list of pointers
+	add a ; double the index, entries of TypeIconPals are 2 bytes (1 color). 
+	; Same as a list of pointers
 	ld c, a
 	ld b, 0
 	add hl, bc

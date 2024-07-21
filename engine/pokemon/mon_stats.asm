@@ -420,12 +420,12 @@ ListMoves:
 	ret
 
 GetMonTypeIndex:
+; Automatically adjusts for Physical/Special split if using it
 	; type in 'c', because farcall clobbers 'a'
 	ld a, c
-IF DEF(PSS)	
+IF DEF(TYPE_MASK) ; Ensures Compatibility with Physical/Special Split
 	and TYPE_MASK ; Phys/Spec Split only
 ENDC
-
 	; Skip Bird
 	cp BIRD
 	jr c, .done
@@ -437,9 +437,8 @@ ENDC
 	ld c, a
 	ret
 
-IF DEF(PSS)
-ELSE
-GetVanillaMoveCategoryIndex::
+
+GetMoveCategoryIndex::
 	ld a, c
 	; given Type in 'c'
 	; get Category index for vanilla, which is based on Type alone
@@ -456,21 +455,28 @@ GetVanillaMoveCategoryIndex::
 	jr c, .statusmove ; means it's a status move
 .notstatusmove
 	pop af
+IF DEF(TYPE_MASK) ; Ensures Compatibility with Physical/Special Split
+	and ~TYPE_MASK
+	swap a
+	srl a
+	srl a
+	dec a
+ENDC ; basically, this function isn't loaded if you're using Physical Special Split	
 	cp SPECIAL
 	jr c, .phys
 ; .special
 	ld a, 1 ; index for special
-	jr .vanilla_done
+	jr .done
 .statusmove
 	pop af
 	ld a, 2 ; index for status move
-	jr .vanilla_done
+	jr .done
 .phys
 	xor a ; index for physical move
-.vanilla_done
+.done
 	ld c, a
 	ret
-ENDC
+
 GetStatusConditionIndex:
 ; de points to status condition bytes of a pokemon from a party_struct or battle_struct
 ; return the status condition index in 'a', and also 'd' for those who farcall

@@ -1200,22 +1200,9 @@ PlaceMoveData:
 	call GetFarByte
 	push af ; raw Move Type+category Byte, unmasked
 
-IF DEF(PSS)
-	and ~TYPE_MASK ; Specific to Phys/Spec split
-	swap a ; Specific to Phys/Spec split
-	srl a  ; Specific to Phys/Spec split
-	srl a  ; Specific to Phys/Spec split
-	dec a  ; Specific to Phys/Spec split
-ELSE
 	ld c, a
-	callfar GetVanillaMoveCategoryIndex
+	callfar GetMoveCategoryIndex ; Accounts for Phys/Spec Split if using it
 	ld a, c
-ENDC
-; vanilla, not PSS
-	; ld b, a
-	; hlcoord 2, 12
-	; predef PrintMoveType
-;
 	ld hl, CategoryIconGFX ; ptr to Category GFX loaded from PNG(2bpp)
 	ld bc, 2 tiles
 	call AddNTimes
@@ -1230,11 +1217,8 @@ ENDC
 	ld [hl], $5a ; category icon tile 2
 ; Place Move Type
 	pop af ; raw Move Type+category Byte, unmasked if using PSS
-IF DEF(PSS)
-	and TYPE_MASK ; Phys/Spec Split specific
-ENDC	
 	ld c, a
-	farcall GetMonTypeIndex
+	farcall GetMonTypeIndex ; Accounts for Phys/Spec Split if using it
 	ld a, c
 ; Type Index adjust done
 ; Load Type GFX Tiles, color will be in Slot 4 of Palette

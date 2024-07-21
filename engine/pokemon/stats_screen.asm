@@ -1127,7 +1127,7 @@ StatsScreen_AnimateEgg:
 	ret
 
 StatsScreen_LoadPageIndicators:
-IF DEF(FSP)
+IF DEF(ORANGE_PAGE) ; if you have a 4th stats page
 	hlcoord 11, 5
 	ld a, $42 ; " " " "
 	call .load_square

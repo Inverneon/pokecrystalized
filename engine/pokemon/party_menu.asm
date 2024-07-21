@@ -866,8 +866,8 @@ LoadStatusIconSet:
 	push bc
 	push hl
 	; status index in a
-	ld a, $1 ; PSN Index
-	ld hl, StatusIconGFX ; Uses the Light Gray pixels, aka Pal Color 2
+	ld a, $0 ; PSN Index
+	ld hl, StatusIconExtraGFX ; Uses the Light Gray pixels, aka Pal Color 2
 	ld bc, 2 * LEN_2BPP_TILE ; Status GFX is 2 Tiles Wide
 	call AddNTimes
 	ld d, h
@@ -876,8 +876,8 @@ LoadStatusIconSet:
 	lb bc, BANK(StatusIconGFX), 2 ; bank in 'b', number of Tiles in 'c'
 	call Request2bpp
 
-	ld a, $2 ; PAR Index
-	ld hl, StatusIconGFX ; Uses the Light Gray pixels, aka Pal Color 2
+	ld a, $1 ; PAR Index
+	ld hl, StatusIconExtraGFX ; Uses the Light Gray pixels, aka Pal Color 2
 	ld bc, 2 * LEN_2BPP_TILE ; Status GFX is 2 Tiles Wide
 	call AddNTimes
 	ld d, h
@@ -886,8 +886,8 @@ LoadStatusIconSet:
 	lb bc, BANK(StatusIconGFX), 2 ; bank in 'b', number of Tiles in 'c'
 	call Request2bpp
 
-	ld a, $3 ; SLP
-	ld hl, StatusIconGFX ; Uses the Light Gray pixels, aka Pal Color 2
+	ld a, $2 ; SLP
+	ld hl, StatusIconExtraGFX ; Uses the Light Gray pixels, aka Pal Color 2
 	ld bc, 2 * LEN_2BPP_TILE ; Status GFX is 2 Tiles Wide
 	call AddNTimes
 	ld d, h
@@ -916,8 +916,8 @@ LoadStatusIconSet:
 	lb bc, BANK(EnemyStatusIconGFX), 2 ; bank in 'b', number of Tiles in 'c'
 	call Request2bpp
 
-	ld a, $6 ; FNT Index
-	ld hl, StatusIconGFX ; FNT is only in the Player's set of Icons aka gfx\battle\status.png
+	ld a, $3 ; FNT Index
+	ld hl, StatusIconExtraGFX ; FNT is only in the Player's set of Icons aka gfx\battle\status.png
 	ld bc, 2 * LEN_2BPP_TILE ; Status GFX is 2 Tiles Wide
 	call AddNTimes
 	ld d, h

@@ -140,7 +140,7 @@ InitPartyMenuStatusPals:
 	push af
 	ld a, BANK(wBGPals1)
 	ldh [rSVBK], a
-	ld a, $FF
+	xor a
 	ld [wBGPals1 palette 4 + 6], a ; pal 4, slot 4, byte 1
 	ld [wBGPals1 palette 5 + 6], a ; pal 5, slot 4, byte 1
 	ld [wBGPals1 palette 6 + 6], a ; pal 6, slot 4, byte 1
@@ -152,18 +152,11 @@ InitPartyMenuStatusPals:
 	ret
 
 LoadBattleCategoryAndTypePals:
-	ld a, [wPlayerMoveStruct + MOVE_TYPE]
-IF DEF(PSS)
-	and ~TYPE_MASK ; Phys/Spec split only
-	swap a ; Phys/Spec split only
-	srl a ; Phys/Spec split only
-	srl a ; Phys/Spec split only
-	dec a ; Phys/Spec split only
-ELSE
+	ld a, [wPlayerMoveStruct + MOVE_TYPE] 
+	; get the move's category (physical or special, or status)
 	ld c, a
-	farcall GetVanillaMoveCategoryIndex
+	farcall GetMoveCategoryIndex
 	ld a, c
-ENDC
 	ld b, a ; Move Category Index
 	ld a, [wPlayerMoveStruct + MOVE_TYPE]
 	ld c, a ; farcall will clobber a for the bank
