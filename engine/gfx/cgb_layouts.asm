@@ -180,8 +180,13 @@ _CGB_FinishBattleScreenLayout:
 	jr nz, .done
 
 	; Move Type and Category pal
-	hlcoord 1, 11, wAttrmap
-	ld bc, 7
+	; hlcoord 1, 11, wAttrmap
+	hlcoord 4, 13, wAttrmap
+	ld bc, 1
+	ld a, $5
+	call ByteFill
+	hlcoord 1, 13, wAttrmap
+	ld bc, 3
 	ld a, $5
 	call ByteFill
 
@@ -969,8 +974,8 @@ _CGB_MoveList:
 	call LoadCPaletteBytesFromHLIntoDE
 
 ; Type and Category tiles
-	hlcoord 2, 13, wAttrmap
-	ld bc, 8 ; area 1 Tile in HEIGHT, 8 Tiles in WIDTH
+	hlcoord 1, 11, wAttrmap
+	ld bc, 5 ; area 1 Tile in HEIGHT, 8 Tiles in WIDTH
 	ld a, $2 ; Palette 2
 	call ByteFill
 	

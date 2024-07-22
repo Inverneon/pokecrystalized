@@ -1161,6 +1161,12 @@ SetUpMoveList:
 	jp Textbox
 
 PrepareToPlaceMoveData:
+	ld b, SCGB_MOVE_LIST
+	call GetSGBLayout ; reload proper palettes for new Move Type and Category, and apply	
+	call SetPalettes
+	call WaitBGMap
+	ld b,b
+	
 	ld hl, wPartyMon1Moves
 	ld bc, PARTYMON_STRUCT_LENGTH
 	ld a, [wCurPartyMon]
@@ -1179,6 +1185,12 @@ PrepareToPlaceMoveData:
 PlaceMoveData:
 	xor a
 	ldh [hBGMapMode], a
+	
+	ld b, SCGB_MOVE_LIST
+	call GetSGBLayout ; reload proper palettes for new Move Type and Category, and apply	
+	call SetPalettes
+	call WaitBGMap
+
 	hlcoord 0, 10
 	ld de, String_MoveType_Top
 	call PlaceString
@@ -1186,12 +1198,11 @@ PlaceMoveData:
 	ld de, String_MoveType_Bottom
 	call PlaceString
 ; Place Move "Atk"/BP String
-	hlcoord 2, 12
+	hlcoord 1, 12
 	ld de, String_MoveAtk ; string for "BP"
 	call PlaceString
 ; Place Move Cateogry	
 	ld a, [wCurSpecies]
-
 	dec a
 	ld hl, Moves + MOVE_TYPE
 	ld bc, MOVE_LENGTH
@@ -1204,17 +1215,17 @@ PlaceMoveData:
 	callfar GetMoveCategoryIndex ; Accounts for Phys/Spec Split if using it
 	ld a, c
 	ld hl, CategoryIconGFX ; ptr to Category GFX loaded from PNG(2bpp)
-	ld bc, 2 tiles
+	ld bc, 1 tiles
 	call AddNTimes
 	ld d, h
 	ld e, l
 	ld hl, vTiles2 tile $59 ; category icon tile slot in VRAM, destination
-	lb bc, BANK(CategoryIconGFX), 2
+	lb bc, BANK(CategoryIconGFX), 1
 	call Request2bpp ; Load 2bpp at b:de to occupy c tiles of hl.
-	hlcoord 7, 13
+	hlcoord 5, 11
 	ld a, $59 ; category icon tile 1
 	ld [hli], a
-	ld [hl], $5a ; category icon tile 2
+	; ld [hl], $5a ; category icon tile 2
 ; Place Move Type
 	pop af ; raw Move Type+category Byte, unmasked if using PSS
 	ld c, a
@@ -1222,30 +1233,34 @@ PlaceMoveData:
 	ld a, c
 ; Type Index adjust done
 ; Load Type GFX Tiles, color will be in Slot 4 of Palette
-	ld hl, TypeIconGFX ; ptr for PNG w/ black Tiles, since this screen is using Slot 4 in the Palette for Type color
-	ld bc, 4 * LEN_1BPP_TILE ; purely Black and White tiles are 1bpp. Type Tiles are 4 Tiles wide
+	ld hl, TypeIconGFX_1bpp ; ptr for PNG w/ black Tiles, since this screen is using Slot 4 in the Palette for Type color
+	ld bc, 3 * LEN_1BPP_TILE ; purely Black and White tiles are 1bpp. Type Tiles are 4 Tiles wide
 	call AddNTimes ; increments pointer based on Type Index
 	ld d, h
 	ld e, l ; de is the source Pointer
 	ld hl, vTiles2 tile $5b ; $5b is destination Tile for first Type Tile
-	lb bc, BANK(TypeIconGFX), 4 ; Bank in 'b', num of Tiles to load in 'c'
+	lb bc, BANK(TypeIconGFX_1bpp), 3 ; Bank in 'b', num of Tiles to load in 'c'
 	call Request1bpp
-	hlcoord 2, 13
+	hlcoord 1, 11
 	ld a, $5b ; first Type Tile
 	ld [hli], a
 	inc a ; Tile $5c
 	ld [hli], a
 	inc a ; Tile $5d
 	ld [hli], a
-	ld [hl], $5e ; final Type Tile
-
+	; ld [hl], $5e ; final Type Tile
+	
+	hlcoord 10, 13
+	ld de, String_MoveChance ; string for "EF"
+	call PlaceString
+	; hlcoord 18, 13
+	; ld [hl], "<%>"
 ; Place Move Accuracy
 	hlcoord 10, 12
 	ld de, String_MoveAcc ; string for "ACC"
 	call PlaceString
-	hlcoord 18, 12
-	ld [hl], "<%>"
-
+	; hlcoord 18, 12
+	; ld [hl], "<%>"
 	; getting the actual Move's accuracy
 	ld a, [wCurSpecies]
 	dec a
@@ -1255,7 +1270,7 @@ PlaceMoveData:
 	ld a, BANK(Moves)
 	call GetFarByte
 	call Adjust_percent ; outputs accuracy in decimal instead of hex to print appropiatley
-	hlcoord 15, 12
+	hlcoord 14, 12
 	ld [wTextDecimalByte], a
 	ld de, wTextDecimalByte
 	lb bc, 1, 3 ; number of bytes of num being printed in 'b', max digits in 'c'
@@ -1269,23 +1284,19 @@ PlaceMoveData:
 	call AddNTimes
 	ld a, BANK(Moves)
 	call GetFarByte
-	hlcoord 15, 13
 	cp 2
-	jr c, .no_efct_chance
-
+	jr nc, .print_efct_chance
+	hlcoord 17, 13
+	ld [hl], " "
+	jr .print_BP
+.print_efct_chance
+	hlcoord 14, 13
 	call Adjust_percent ; outputs chance in decimal instead of hex to print appropiatley
 	ld [wTextDecimalByte], a
 	ld de, wTextDecimalByte
 	lb bc, 1, 3 ; number of bytes of num being printed in 'b', max digits in 'c'
 	call PrintNum
-
-	hlcoord 10, 13
-	ld de, String_MoveChance ; string for "EFCT"
-	call PlaceString
-	hlcoord 18, 13
-	ld [hl], "<%>"
-.no_efct_chance
-
+.print_BP
 ; Print BP Num (Battle Power aka Move ATK)
 	ld a, [wCurSpecies]
 	dec a
@@ -1294,15 +1305,15 @@ PlaceMoveData:
 	call AddNTimes
 	ld a, BANK(Moves)
 	call GetFarByte
-	hlcoord 6, 12
+	hlcoord 4, 12
 	cp 2
 	jr c, .no_power ; means it's a status move
 	ld [wTextDecimalByte], a
 	ld de, wTextDecimalByte
 	lb bc, 1, 3 ; number of bytes of num being printed in 'b', max digits in 'c'
+	set 6, b ; left-align
 	call PrintNum
 	jr .description ; printed BP, don't overwrite with "---", jump to print description
-
 .no_power
 	ld de, String_MoveNoPower ; string for "---"
 	call PlaceString
@@ -1310,8 +1321,11 @@ PlaceMoveData:
 .description
 	hlcoord 1, 14
 	predef PrintMoveDescription
+	
 	ld b, SCGB_MOVE_LIST
 	call GetSGBLayout ; reload proper palettes for new Move Type and Category, and apply	
+	call SetPalettes
+	call WaitBGMap
 	ld a, $1 ; done editing the screen
 	ldh [hBGMapMode], a
 	ret
@@ -1319,14 +1333,15 @@ PlaceMoveData:
 String_MoveType_Top:
 	db "┌─────┐@"
 String_MoveType_Bottom:
-	db "│TYPE/└@"
+	db "│     └@"
+	; db "│TYPE/└@"
 String_MoveAtk:
 	; db "ATK/@"
-	db "<BOLD_B><BOLD_P> /@"
+	db "<BOLD_B><BOLD_P>/@"
 String_MoveAcc:
-	db "<BOLD_A><BOLD_C><BOLD_C>/@"
+	db "<BOLD_A><BOLD_C><BOLD_C>/   <%>@"
 String_MoveChance:
-	db "EFCT/@"
+	db "<BOLD_E><BOLD_F>/    <%>@"
 String_MoveNoPower:
 	db "---@"
 

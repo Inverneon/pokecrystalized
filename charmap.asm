@@ -85,7 +85,7 @@
 	charmap "(",         $9a
 	charmap ")",         $9b
 	charmap ":",         $9c
-	charmap ";",         $9d
+	charmap "<BOLD_E>",   $9d
 	charmap "[",         $9e
 	charmap "]",         $9f
 
@@ -151,7 +151,8 @@
 	charmap "“",         $dd ; opening quote
 	charmap "”",         $de ; closing quote
 
-	charmap "←",         $df
+	; charmap "←",         $df
+	charmap "<BOLD_F>",  $df
 	charmap "'",         $e0
 	charmap "<PK>",      $e1
 	charmap "<MN>",      $e2

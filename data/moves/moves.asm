@@ -2,12 +2,12 @@
 
 MACRO move
 	db \1 ; animation
-	db \2 ; effect
-	db \3 ; power
-	db \4 ; type
-	db \5 percent ; accuracy
-	db \6 ; pp
-	db \7 percent ; effect chance
+	db \2 ; effect ; MOVE_EFFECT
+	db \3 ; power ; [wPlayerMoveStruct + MOVE_POWER]
+	db \4 ; type  ; [wPlayerMoveStruct + MOVE_TYPE]
+	db \5 percent ; accuracy ; [wPlayerMoveStruct + MOVE_ACC]
+	db \6 ; pp ; MOVE_PP
+	db \7 percent ; effect chance ; MOVE_CHANCE
 	assert \6 <= 40, "PP must be 40 or less"
 ENDM
 

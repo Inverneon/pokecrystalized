@@ -295,12 +295,12 @@ Dex_PrintMonTypeTiles:
 	ld a, c
 ; load the tiles
 	ld hl, TypeLightIconGFX ; gfx\stats\types_light.png
-	ld bc, 4 * LEN_2BPP_TILE ; Type GFX are 4 Tiles wide
+	ld bc, 3 * LEN_2BPP_TILE ; Type GFX are 3 Tiles wide
 	call AddNTimes ; increments the TypeLightIconGFX pointer to the right address of the needed Type Tiles
 	ld d, h
 	ld e, l
 	ld hl, vTiles2 tile $70 ; destination address of the Tile, in this case Tiles $70-$73
-	lb bc, BANK(TypeLightIconGFX), 4 ; Bank in 'b', Number of Tiles being loaded in 'c'
+	lb bc, BANK(TypeLightIconGFX), 3 ; Bank in 'b', Number of Tiles being loaded in 'c'
 	call Request2bpp
 ; 2nd Type
 	ld a, [wBaseType2]
@@ -309,12 +309,12 @@ Dex_PrintMonTypeTiles:
 	ld a, c
 ; load type 2 tiles
 	ld hl, TypeDarkIconGFX ; gfx\stats\types_dark.png
-	ld bc, 4 * LEN_2BPP_TILE ; Type GFX are 4 Tiles wide
+	ld bc, 3 * LEN_2BPP_TILE ; Type GFX are 3 Tiles wide
 	call AddNTimes ; increments the TypeDarkIconGFX pointer to the right address of the needed Type Tiles
 	ld d, h
 	ld e, l
 	ld hl, vTiles2 tile $74 ; destination address of the Tile, in this case Tiles $74-$77
-	lb bc, BANK(TypeDarkIconGFX), 4 ; Bank in 'b', Number of Tiles being loaded in 'c'
+	lb bc, BANK(TypeDarkIconGFX), 3 ; Bank in 'b', Number of Tiles being loaded in 'c'
 	call Request2bpp
 
 	hlcoord 9, 1
@@ -324,8 +324,8 @@ Dex_PrintMonTypeTiles:
 	inc hl
 	ld [hl], $72
 	inc hl
-	ld [hl], $73
-	inc hl
+	; ld [hl], $73
+	; inc hl
 	ld a, [wBaseType1]
 	ld b, a
 	ld a, [wBaseType2]
@@ -336,6 +336,6 @@ Dex_PrintMonTypeTiles:
 	ld [hl], $75
 	inc hl
 	ld [hl], $76
-	inc hl
-	ld [hl], $77
+	; inc hl
+	; ld [hl], $77
 	ret

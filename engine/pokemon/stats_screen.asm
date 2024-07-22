@@ -1253,13 +1253,13 @@ PrintMonTypeTiles:
 	ld c, a ; farcall will clobber a for the bank
 	farcall GetMonTypeIndex
 	ld a, c
-	ld hl, TypeLightIconGFX ; from gfx\stats\types_light.png
-	ld bc, 4 * LEN_2BPP_TILE ; Type GFX is 4 tiles wide
+	ld hl, TypeLightIconGFX_StatScreen ; from gfx\stats\types_light.png
+	ld bc, 3 * LEN_2BPP_TILE ; Type GFX is 3 tiles wide
 	call AddNTimes
 	ld d, h
 	ld e, l
 	ld hl, vTiles2 tile $4c
-	lb bc, BANK(TypeLightIconGFX), 4 ; Bank in 'c', Number of Tiles in 'c'
+	lb bc, BANK(TypeLightIconGFX_StatScreen), 3 ; Bank in 'c', Number of Tiles in 'c'
 	call Request2bpp
 
 ; placing the Type1 Tiles (from gfx\stats\types_light.png)
@@ -1270,8 +1270,8 @@ PrintMonTypeTiles:
 	inc hl
 	ld [hl], $4e
 	inc hl
-	ld [hl], $4f
-	inc hl
+	; ld [hl], $4f
+	; inc hl
 	ld a, [wBaseType1]
 	ld b, a
 	ld a, [wBaseType2]
@@ -1283,13 +1283,13 @@ PrintMonTypeTiles:
 	ld c, a ; Pokemon's second type
 	farcall GetMonTypeIndex
 	ld a, c
-	ld hl, TypeDarkIconGFX ; from gfx\stats\types_dark.png
-	ld bc, 4 * LEN_2BPP_TILE ; Type GFX is 4 Tiles Wide
+	ld hl, TypeDarkIconGFX_StatScreen ; from gfx\stats\types_dark.png
+	ld bc, 3 * LEN_2BPP_TILE ; Type GFX is 3 Tiles Wide
 	call AddNTimes ; type index needs to be in 'a'
 	ld d, h
 	ld e, l
 	ld hl, vTiles2 tile $5c
-	lb bc, BANK(TypeDarkIconGFX), 4 ; Bank in 'c', Number of Tiles in 'c'
+	lb bc, BANK(TypeDarkIconGFX_StatScreen), 3 ; Bank in 'c', Number of Tiles in 'c'
 	call Request2bpp
 	
 ; place Type 2 GFX
@@ -1299,6 +1299,6 @@ PrintMonTypeTiles:
 	ld [hl], $5d
 	inc hl
 	ld [hl], $5e
-	inc hl
-	ld [hl], $5f
+	; inc hl
+	; ld [hl], $5f
 	ret

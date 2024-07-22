@@ -5368,6 +5368,19 @@ MoveSelectionScreen:
 	ld c, 14
 .got_dims
 	call Textbox
+	
+	ld a, " "
+	hlcoord 4, 13
+	ld [hl], a
+	hlcoord 4, 14
+	ld [hl], a
+	hlcoord 4, 15
+	ld [hl], a
+	hlcoord 4, 16
+	ld [hl], a
+	ld a, "─"
+	hlcoord 4, 17
+	ld [hl], a
 
 	hlcoord 6, 17 - NUM_MOVES
 	ld a, [wMoveSelectionMenuType]
@@ -5648,8 +5661,8 @@ MoveInfoBox:
 	xor a
 	ldh [hBGMapMode], a
 
-	hlcoord 0, 7 ; upper right corner of the textbox
-	ld b, 4 ; Box height
+	hlcoord 0, 8 ; 7 ; upper right corner of the textbox
+	ld b, 3 ; 4 ; Box height
 	ld c, 7 ; Box length
 	call Textbox
 	call MobileTextBorder
@@ -5665,10 +5678,11 @@ MoveInfoBox:
 	cp b
 	jr nz, .not_disabled
 
-	hlcoord 1, 11
+; TODO
+	hlcoord 1, 10
 	ld de, .Disabled1
 	call PlaceString
-	hlcoord 1, 10
+	hlcoord 1, 11
 	ld de, .Disabled2
 	call PlaceString
 	jp .done
@@ -5709,45 +5723,47 @@ MoveInfoBox:
 	ld c, a ; farcall will clobber a for the bank
 	farcall GetMonTypeIndex ; Automatically adjusts for Physical/Special split if using it
 	ld a, c ; Type Index
-	ld hl, TypeIconGFX ; from gfx\battle\types.png, uses Color 4
-	ld bc, 4 * LEN_1BPP_TILE ; Type GFX is 4 Tiles Wide
+	ld hl, TypeIconGFX_1bpp ; from gfx\battle\types.png, uses Color 4
+	ld bc, 3 * LEN_1BPP_TILE ; Type GFX is 3 Tiles Wide
 	call AddNTimes
 	ld d, h
 	ld e, l
 	ld hl, vTiles2 tile $55 
-	lb bc, BANK(TypeIconGFX), 4 ; bank in 'b', Num of Tiles in 'c'
+	lb bc, BANK(TypeIconGFX_1bpp), 3 ; bank in 'b', Num of Tiles in 'c'
 	call Request1bpp
-	hlcoord 4, 11 ; placing the Type Tiles in  the MoveInfoBox
+	; hlcoord 4, 11 ; placing the Type Tiles in  the MoveInfoBox
+	hlcoord 1, 13
 	ld [hl], $55
 	inc hl
 	ld [hl], $56
 	inc hl
 	ld [hl], $57
-	inc hl
-	ld [hl], $58
+	; inc hl
+	; ld [hl], $58
 	; get move category
 	ld a, [wPlayerMoveStruct + MOVE_TYPE]
 	ld c, a
 	farcall GetMoveCategoryIndex
 	ld a, c
 	ld hl, CategoryIconGFX
-	ld bc, 2 tiles ; Move Category is 2 Tiles wide 
+	ld bc, 1 tiles ; Move Category is 1 Tiles wide 
 	call AddNTimes
 	ld d, h
 	ld e, l
 	ld hl, vTiles2 tile $59
-	lb bc, BANK(CategoryIconGFX), 2 ; bank in 'b', Num of Tiles in 'c'
+	lb bc, BANK(CategoryIconGFX), 1 ; bank in 'b', Num of Tiles in 'c'
 	call Request2bpp ; Load 2bpp at b:de to occupy c tiles of hl.
-	hlcoord 1, 11 ; placing the Category Tiles in the MoveInfoBox
+	; hlcoord 1, 11 ; placing the Category Tiles in the MoveInfoBox
+	hlcoord 4, 13
 	ld [hl], $59
-	inc hl
-	ld [hl], $5a
+	; inc hl
+	; ld [hl], $5a
 ; print move BP (Base Power)
 	ld de, .power_string ; "BP"
-	hlcoord 1, 8
+	hlcoord 1, 9
 	call PlaceString
 
-	hlcoord 4, 8
+	hlcoord 4, 9
 	ld a, [wPlayerMoveStruct + MOVE_POWER]
 	and a
 	jr nz, .haspower
@@ -5762,15 +5778,86 @@ MoveInfoBox:
 	
 ; print move ACC
 .print_acc
-	hlcoord 1, 9
+	hlcoord 1, 10
 	ld de, .accuracy_string ; "ACC"
 	call PlaceString
-	hlcoord 7, 9
+	hlcoord 7, 10
 	ld [hl], "<%>"
-	hlcoord 4, 9
+	hlcoord 4, 10
 	ld a, [wPlayerMoveStruct + MOVE_ACC]
+	call Adjust_Percent_Battle
+.print_num_acc
+	ld [wTextDecimalByte], a
+	ld de, wTextDecimalByte
+	lb bc, 1, 3 ; number of bytes this number is in, in 'b', number of possible digits in 'c'
+	call PrintNum
+; Effect Chance
+	hlcoord 1, 11
+	ld de, .EffectChance
+	call PlaceString
+
+	hlcoord 4, 11
+	ld a, [wPlayerMoveStruct + MOVE_CHANCE]
+	call Adjust_Percent_Battle
+	and a
+	jr nz, .print_effect_chance
+	; print the "---"
+	ld de, .nopower_string ; "---"
+	call PlaceString
+	jr .effect_chance_done
+.print_effect_chance
+	ld [wTextDecimalByte], a
+	ld de, wTextDecimalByte
+	lb bc, 1, 3 ; number of bytes this number is in, in 'b', number of possible digits in 'c'
+	call PrintNum
+	hlcoord 7, 11
+	ld [hl], "<%>"	
+.effect_chance_done
+; set battle CGB layout	
+	ld b, SCGB_BATTLE_COLORS
+	call GetSGBLayout	
+.done
+	ret
+
+.PrintPP:
+	hlcoord 1, 15 ;3, 10
+	ld [hl], " "
+	push hl
+	ld de, wStringBuffer1
+	lb bc, 1, 2
+	; set 7, b ; prints a leading zero
+	call PrintNum
+	pop hl
+	inc hl
+	inc hl
+	ld [hl], "/"
+	hlcoord 1, 16 ; inc hl
+	ld [hl], " "
+	ld de, wNamedObjectIndex
+	lb bc, 1, 2
+	call PrintNum
+	hlcoord 1, 14 ; 10
+	ld a, "<BOLD_P>"
+	ld [hli], a
+	ld [hl], a	
+	ret
+.power_string:
+	db "<BOLD_B><BOLD_P>@"
+.nopower_string:
+	db "---@"
+.accuracy_string:
+	db "<BOLD_A><BOLD_C>@"
+.Disabled1:
+	db "Dis-@"
+.Disabled2:
+	db "abled!@"
+; .Type:
+; 	db "TYPE/@"
+.EffectChance:
+	db "<BOLD_E><BOLD_F>@"	
+
+Adjust_Percent_Battle:
 ; convert from hex to decimal
-; this is the same code used in function "Adjust_Percent" in engine\pokemon\mon_stats.asm
 	ldh [hMultiplicand], a
 	ld a, 100
 	ldh [hMultiplier], a
@@ -5782,50 +5869,11 @@ MoveInfoBox:
 	call Divide
 	ldh a, [hQuotient + 3]
 	cp 100
-	jr z, .print_num
+	ret z
+	and a
+	ret z
 	inc a
-.print_num
-	ld [wTextDecimalByte], a
-	ld de, wTextDecimalByte
-	lb bc, 1, 3 ; number of bytes this number is in, in 'b', number of possible digits in 'c'
-	call PrintNum
-	ld b, SCGB_BATTLE_COLORS
-	call GetSGBLayout	
-.done
 	ret
-
-.Disabled1:
-	db "Dis-@"
-.Disabled2:
-	db "abled!@"
-.Type:
-	db "TYPE/@"
-
-.PrintPP:
-	hlcoord 3, 10
-	push hl
-	ld de, wStringBuffer1
-	lb bc, 1, 2
-	call PrintNum
-	pop hl
-	inc hl
-	inc hl
-	ld [hl], "/"
-	inc hl
-	ld de, wNamedObjectIndex
-	lb bc, 1, 2
-	call PrintNum
-	hlcoord 1, 10
-	ld a, "<BOLD_P>"
-	ld [hli], a
-	ld [hl], a	
-	ret
-.power_string:
-	db "<BOLD_B><BOLD_P>@"
-.nopower_string:
-	db "---@"
-.accuracy_string:
-	db "<BOLD_A><BOLD_C>@"	
 
 CheckPlayerHasUsableMoves:
 	ld a, STRUGGLE
