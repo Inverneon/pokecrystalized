@@ -168,11 +168,15 @@ _CGB_FinishBattleScreenLayout:
 	ld a, $6
 	call FillBoxCGB
 	; player's
+	lda_coord 5, 2
+	cp "┌"
+	jr z, .start_moveinfobox
 	hlcoord 10, 8, wAttrmap
 	lb bc, 1, 2
 	ld a, $6
 	call FillBoxCGB
 
+.start_moveinfobox
 ; check if we're in the MoveInfoBox
 	hlcoord 0, 12
 	ld a, [hl]

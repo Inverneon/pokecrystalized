@@ -5664,7 +5664,7 @@ MoveInfoBox:
 
 	hlcoord 0, 9 ; 8 ; 7 ; upper right corner of the textbox
 	ld b, 2 ; 3 ; 4 ; Box height
-	ld c, 6 ; 7 ; Box length
+	ld c, 7 ; 6 ; Box length
 	call Textbox
 	call MobileTextBorder
 
@@ -5763,7 +5763,7 @@ MoveInfoBox:
 	hlcoord 1, 10
 	call PlaceString
 
-	hlcoord 4, 10 ; 5, 10
+	hlcoord 4, 10 
 	ld a, [wPlayerMoveStruct + MOVE_POWER]
 	and a
 	jr nz, .haspower
@@ -5823,37 +5823,34 @@ MoveInfoBox:
 .PrintPP:
 	hlcoord 3, 15 ; 1, 15 ;3, 10
 	ld [hl], " "
-	; push hl
+	hlcoord 2, 15
 	ld de, wStringBuffer1
-	lb bc, 1, 2
-	; set 7, b ; prints a leading zero
+	lb bc, PRINTNUM_LEFTALIGN | 1, 2
+	; lb bc, 1, 2 ; PRINTNUM_LEFTALIGN |
 	call PrintNum
-	; pop hl
-	; inc hl
-	; inc hl
-	hlcoord 2, 16
-	ld [hl], "/"
-	inc hl
-	; hlcoord 3, 15 ; 2, 15; 1, 16 ; inc hl
+	hlcoord 3, 16
 	ld [hl], " "
+	hlcoord 2, 16
 	ld de, wNamedObjectIndex
-	lb bc, 1, 2
-	call PrintNum
-	hlcoord 1, 15 ; 10
+	lb bc, PRINTNUM_LEFTALIGN | 1, 2
+	; lb bc, 1, 2 ; PRINTNUM_LEFTALIGN |
+	call PrintNum	
+	hlcoord 1, 15; 4, 15
+	ld [hl], "/"
+
+	hlcoord 1, 14 ; 1, 15 ; 10
 	ld a, "<BOLD_P>"
 	ld [hli], a
 	ld [hl], a	
 	ret
 .power_string:
-	db "<BOLD_P><BOLD_O><BOLD_W> @"
+	db "<BOLD_P><BOLD_O><BOLD_W>  @"
 .nopower_string:
 	db "---@"
 .no_effect_str:
 	db "    @"
 .accuracy_string:
-	db "<BOLD_A><BOLD_C>   @"
-	; db "<BOLD_A><BOLD_C>    <%>@"
-	; db "<BOLD_A><BOLD_C><BOLD_C>@"
+	db "<BOLD_A><BOLD_C><BOLD_C>   <%>@"
 .Disabled1:
 	db "Dis-@"
 .Disabled2:

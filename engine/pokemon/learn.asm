@@ -31,8 +31,12 @@ LearnMove:
 ; to make room for the new move we're trying to learn.
 	push de
 	call ForgetMove
+	push af
+	ld b, SCGB_BATTLE_COLORS
+	call GetSGBLayout
+	pop af
 	pop de
-	jp c, .cancel
+	jr c, .cancel
 
 	push hl
 	push de
@@ -140,6 +144,8 @@ ForgetMove:
 	ld b, NUM_MOVES * 2
 	ld c, MOVE_NAME_LENGTH
 	call Textbox
+	ld b, SCGB_BATTLE_COLORS
+	call GetSGBLayout
 	hlcoord 5 + 2, 2 + 2
 	ld a, SCREEN_WIDTH * 2
 	ld [wListMovesLineSpacing], a
