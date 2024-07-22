@@ -5357,47 +5357,47 @@ MoveSelectionScreen:
 	xor a
 	ldh [hBGMapMode], a
 
-	hlcoord 4, 17 - NUM_MOVES - 1
+	hlcoord 5, 17 - NUM_MOVES - 1
 	ld b, 4
-	ld c, 14
+	ld c, 13 ; 14
 	ld a, [wMoveSelectionMenuType]
 	cp $2
 	jr nz, .got_dims
-	hlcoord 4, 17 - NUM_MOVES - 1 - 4
+	hlcoord 5, 17 - NUM_MOVES - 1 - 4
 	ld b, 4
-	ld c, 14
+	ld c, 13
 .got_dims
 	call Textbox
 	
-	ld a, " "
-	hlcoord 4, 13
-	ld [hl], a
-	hlcoord 4, 14
-	ld [hl], a
-	hlcoord 4, 15
-	ld [hl], a
-	hlcoord 4, 16
-	ld [hl], a
-	ld a, "─"
-	hlcoord 4, 17
-	ld [hl], a
+	; ld a, " "
+	; hlcoord 4, 13
+	; ld [hl], a
+	; hlcoord 4, 14
+	; ld [hl], a
+	; hlcoord 4, 15
+	; ld [hl], a
+	; hlcoord 4, 16
+	; ld [hl], a
+	; ld a, "─"
+	; hlcoord 4, 17
+	; ld [hl], a
 
-	hlcoord 6, 17 - NUM_MOVES
+	hlcoord 7, 17 - NUM_MOVES
 	ld a, [wMoveSelectionMenuType]
 	cp $2
 	jr nz, .got_start_coord
-	hlcoord 6, 17 - NUM_MOVES - 4
+	hlcoord 7, 17 - NUM_MOVES - 4
 .got_start_coord
 	ld a, SCREEN_WIDTH
 	ld [wListMovesLineSpacing], a
 	predef ListMoves
 
-	ld b, 5
+	ld b, 6
 	ld a, [wMoveSelectionMenuType]
 	cp $2
 	ld a, 17 - NUM_MOVES
 	jr nz, .got_default_coord
-	ld b, 5
+	ld b, 6
 	ld a, 17 - NUM_MOVES - 4
 
 .got_default_coord
@@ -5457,7 +5457,8 @@ MoveSelectionScreen:
 	ld a, [wSwappingMove]
 	and a
 	jr z, .interpret_joypad
-	hlcoord 5, 13
+	; hlcoord 5, 13
+	hlcoord 6, 13
 	ld bc, SCREEN_WIDTH
 	dec a
 	call AddNTimes
@@ -5661,9 +5662,9 @@ MoveInfoBox:
 	xor a
 	ldh [hBGMapMode], a
 
-	hlcoord 0, 8 ; 7 ; upper right corner of the textbox
-	ld b, 3 ; 4 ; Box height
-	ld c, 7 ; Box length
+	hlcoord 0, 9 ; 8 ; 7 ; upper right corner of the textbox
+	ld b, 2 ; 3 ; 4 ; Box height
+	ld c, 6 ; 7 ; Box length
 	call Textbox
 	call MobileTextBorder
 
@@ -5678,7 +5679,6 @@ MoveInfoBox:
 	cp b
 	jr nz, .not_disabled
 
-; TODO
 	hlcoord 1, 10
 	ld de, .Disabled1
 	call PlaceString
@@ -5759,11 +5759,11 @@ MoveInfoBox:
 	; inc hl
 	; ld [hl], $5a
 ; print move BP (Base Power)
-	ld de, .power_string ; "BP"
-	hlcoord 1, 9
+	ld de, .power_string ; "POW"
+	hlcoord 1, 10
 	call PlaceString
 
-	hlcoord 4, 9
+	hlcoord 4, 10 ; 5, 10
 	ld a, [wPlayerMoveStruct + MOVE_POWER]
 	and a
 	jr nz, .haspower
@@ -5774,16 +5774,17 @@ MoveInfoBox:
 	ld [wTextDecimalByte], a
 	ld de, wTextDecimalByte
 	lb bc, 1, 3 ; number of bytes this number is in, in 'b', number of possible digits in 'c'
+	; set 6, b ; align the number to the left
 	call PrintNum
 	
 ; print move ACC
 .print_acc
-	hlcoord 1, 10
+	hlcoord 1, 11
 	ld de, .accuracy_string ; "ACC"
 	call PlaceString
-	hlcoord 7, 10
-	ld [hl], "<%>"
-	hlcoord 4, 10
+	; hlcoord 7, 10
+	; ld [hl], "<%>"
+	hlcoord 4, 11 ;5, 11 ;4, 10
 	ld a, [wPlayerMoveStruct + MOVE_ACC]
 	call Adjust_Percent_Battle
 .print_num_acc
@@ -5791,28 +5792,28 @@ MoveInfoBox:
 	ld de, wTextDecimalByte
 	lb bc, 1, 3 ; number of bytes this number is in, in 'b', number of possible digits in 'c'
 	call PrintNum
-; Effect Chance
-	hlcoord 1, 11
-	ld de, .EffectChance
-	call PlaceString
+; ; Effect Chance
+; 	; hlcoord 1, 11
+; 	; ld de, .EffectChance
+; 	; call PlaceString
 
-	hlcoord 4, 11
-	ld a, [wPlayerMoveStruct + MOVE_CHANCE]
-	call Adjust_Percent_Battle
-	and a
-	jr nz, .print_effect_chance
-	; print the "---"
-	ld de, .nopower_string ; "---"
-	call PlaceString
-	jr .effect_chance_done
-.print_effect_chance
-	ld [wTextDecimalByte], a
-	ld de, wTextDecimalByte
-	lb bc, 1, 3 ; number of bytes this number is in, in 'b', number of possible digits in 'c'
-	call PrintNum
-	hlcoord 7, 11
-	ld [hl], "<%>"	
-.effect_chance_done
+; 	hlcoord 1, 16 ; 5, 11
+; 	ld a, [wPlayerMoveStruct + MOVE_CHANCE]
+; 	call Adjust_Percent_Battle
+; 	and a
+; 	jr nz, .print_effect_chance
+; 	; print the "---"
+; 	ld de, .no_effect_str; .nopower_string ; "---"
+; 	call PlaceString
+; 	jr .effect_chance_done
+; .print_effect_chance
+; 	ld [wTextDecimalByte], a
+; 	ld de, wTextDecimalByte
+; 	lb bc, 1, 3 ; number of bytes this number is in, in 'b', number of possible digits in 'c'
+; 	call PrintNum
+; 	hlcoord 4, 16 ; 7, 11
+; 	ld [hl], "<%>"	
+; .effect_chance_done
 ; set battle CGB layout	
 	ld b, SCGB_BATTLE_COLORS
 	call GetSGBLayout	
@@ -5820,33 +5821,39 @@ MoveInfoBox:
 	ret
 
 .PrintPP:
-	hlcoord 1, 15 ;3, 10
+	hlcoord 3, 15 ; 1, 15 ;3, 10
 	ld [hl], " "
-	push hl
+	; push hl
 	ld de, wStringBuffer1
 	lb bc, 1, 2
 	; set 7, b ; prints a leading zero
 	call PrintNum
-	pop hl
-	inc hl
-	inc hl
+	; pop hl
+	; inc hl
+	; inc hl
+	hlcoord 2, 16
 	ld [hl], "/"
-	hlcoord 1, 16 ; inc hl
+	inc hl
+	; hlcoord 3, 15 ; 2, 15; 1, 16 ; inc hl
 	ld [hl], " "
 	ld de, wNamedObjectIndex
 	lb bc, 1, 2
 	call PrintNum
-	hlcoord 1, 14 ; 10
+	hlcoord 1, 15 ; 10
 	ld a, "<BOLD_P>"
 	ld [hli], a
 	ld [hl], a	
 	ret
 .power_string:
-	db "<BOLD_B><BOLD_P>@"
+	db "<BOLD_P><BOLD_O><BOLD_W> @"
 .nopower_string:
 	db "---@"
+.no_effect_str:
+	db "    @"
 .accuracy_string:
-	db "<BOLD_A><BOLD_C>@"
+	db "<BOLD_A><BOLD_C>   @"
+	; db "<BOLD_A><BOLD_C>    <%>@"
+	; db "<BOLD_A><BOLD_C><BOLD_C>@"
 .Disabled1:
 	db "Dis-@"
 .Disabled2:

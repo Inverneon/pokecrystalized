@@ -974,7 +974,7 @@ _CGB_MoveList:
 	call LoadCPaletteBytesFromHLIntoDE
 
 ; Type and Category tiles
-	hlcoord 1, 11, wAttrmap
+	hlcoord 1, 12, wAttrmap
 	ld bc, 5 ; area 1 Tile in HEIGHT, 8 Tiles in WIDTH
 	ld a, $2 ; Palette 2
 	call ByteFill

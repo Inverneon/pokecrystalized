@@ -906,14 +906,14 @@ MoveScreenLoop:
 	jp .joy_loop
 
 .moving_move
-	ld a, " "
-	hlcoord 1, 11
-	ld bc, 5
-	call ByteFill
+	; ld a, " "
+	; hlcoord 1, 11
+	; ld bc, 5
+	; call ByteFill
 	hlcoord 1, 12
 	lb bc, 5, SCREEN_WIDTH - 2
 	call ClearBox
-	hlcoord 1, 12
+	hlcoord 1, 13
 	ld de, String_MoveWhere
 	call PlaceString
 	jp .joy_loop
@@ -1160,13 +1160,7 @@ SetUpMoveList:
 	ld c, 18
 	jp Textbox
 
-PrepareToPlaceMoveData:
-	ld b, SCGB_MOVE_LIST
-	call GetSGBLayout ; reload proper palettes for new Move Type and Category, and apply	
-	call SetPalettes
-	call WaitBGMap
-	ld b,b
-	
+PrepareToPlaceMoveData:	
 	ld hl, wPartyMon1Moves
 	ld bc, PARTYMON_STRUCT_LENGTH
 	ld a, [wCurPartyMon]
@@ -1186,20 +1180,20 @@ PlaceMoveData:
 	xor a
 	ldh [hBGMapMode], a
 	
-	ld b, SCGB_MOVE_LIST
-	call GetSGBLayout ; reload proper palettes for new Move Type and Category, and apply	
-	call SetPalettes
-	call WaitBGMap
+	; ld b, SCGB_MOVE_LIST
+	; call GetSGBLayout ; reload proper palettes for new Move Type and Category, and apply	
+	; call SetPalettes
+	; call WaitBGMap
 
-	hlcoord 0, 10
-	ld de, String_MoveType_Top
-	call PlaceString
-	hlcoord 0, 11
-	ld de, String_MoveType_Bottom
-	call PlaceString
-; Place Move "Atk"/BP String
-	hlcoord 1, 12
-	ld de, String_MoveAtk ; string for "BP"
+	; hlcoord 0, 10
+	; ld de, String_MoveType_Top
+	; call PlaceString
+	; hlcoord 0, 11
+	; ld de, String_MoveType_Bottom
+	; call PlaceString
+; Place Move POW/"Atk"/BP String
+	hlcoord 1, 13
+	ld de, String_MoveAtk ; string for POW/"BP"
 	call PlaceString
 ; Place Move Cateogry	
 	ld a, [wCurSpecies]
@@ -1222,7 +1216,7 @@ PlaceMoveData:
 	ld hl, vTiles2 tile $59 ; category icon tile slot in VRAM, destination
 	lb bc, BANK(CategoryIconGFX), 1
 	call Request2bpp ; Load 2bpp at b:de to occupy c tiles of hl.
-	hlcoord 5, 11
+	hlcoord 5, 12
 	ld a, $59 ; category icon tile 1
 	ld [hli], a
 	; ld [hl], $5a ; category icon tile 2
@@ -1241,7 +1235,7 @@ PlaceMoveData:
 	ld hl, vTiles2 tile $5b ; $5b is destination Tile for first Type Tile
 	lb bc, BANK(TypeIconGFX_1bpp), 3 ; Bank in 'b', num of Tiles to load in 'c'
 	call Request1bpp
-	hlcoord 1, 11
+	hlcoord 1, 12
 	ld a, $5b ; first Type Tile
 	ld [hli], a
 	inc a ; Tile $5c
@@ -1288,7 +1282,7 @@ PlaceMoveData:
 	jr nc, .print_efct_chance
 	hlcoord 17, 13
 	ld [hl], " "
-	jr .print_BP
+	jr .print_POW
 .print_efct_chance
 	hlcoord 14, 13
 	call Adjust_percent ; outputs chance in decimal instead of hex to print appropiatley
@@ -1296,8 +1290,8 @@ PlaceMoveData:
 	ld de, wTextDecimalByte
 	lb bc, 1, 3 ; number of bytes of num being printed in 'b', max digits in 'c'
 	call PrintNum
-.print_BP
-; Print BP Num (Battle Power aka Move ATK)
+.print_POW
+; Print POW/BP Num (Battle Power aka Move ATK)
 	ld a, [wCurSpecies]
 	dec a
 	ld hl, Moves + MOVE_POWER
@@ -1305,7 +1299,7 @@ PlaceMoveData:
 	call AddNTimes
 	ld a, BANK(Moves)
 	call GetFarByte
-	hlcoord 4, 12
+	hlcoord 5, 13
 	cp 2
 	jr c, .no_power ; means it's a status move
 	ld [wTextDecimalByte], a
@@ -1324,20 +1318,20 @@ PlaceMoveData:
 	
 	ld b, SCGB_MOVE_LIST
 	call GetSGBLayout ; reload proper palettes for new Move Type and Category, and apply	
-	call SetPalettes
-	call WaitBGMap
+	; call SetPalettes
+	; call WaitBGMap
 	ld a, $1 ; done editing the screen
 	ldh [hBGMapMode], a
 	ret
 
-String_MoveType_Top:
-	db "┌─────┐@"
-String_MoveType_Bottom:
-	db "│     └@"
-	; db "│TYPE/└@"
+; String_MoveType_Top:
+; 	db "┌─────┐@"
+; String_MoveType_Bottom:
+; 	db "│     └@"
+; 	; db "│TYPE/└@"
 String_MoveAtk:
-	; db "ATK/@"
-	db "<BOLD_B><BOLD_P>/@"
+	; db "POW/@"
+	db "<BOLD_P><BOLD_O><BOLD_W>/@"
 String_MoveAcc:
 	db "<BOLD_A><BOLD_C><BOLD_C>/   <%>@"
 String_MoveChance:
