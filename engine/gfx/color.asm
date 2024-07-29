@@ -43,6 +43,34 @@ CheckShininess:
 	and a
 	ret
 
+LoadMonBaseTypePal:
+	; destination address of Palette and Slot is passed in 'de'
+	; Type Index (already fixed/adjusted if a Special Type) is passed in 'c'
+	ld hl, TypeIconPals ; pointer to the Type Colors designated in gfx\types_cats_status_pals.asm
+	ld a, c ; c is the Type Index
+	add a
+	ld c, a
+	ld b, 0
+	add hl, bc
+	ld bc, 2
+	jp FarCopyColorWRAM
+
+LoadSingleBlackPal:
+	; Destination address of the Palette and Slot is passed in 'de'
+	ldh a, [rSVBK]
+	push af
+	ld a, BANK(wBGPals1)
+	ldh [rSVBK], a
+	xor a ; the color black is $0000
+	ld [de], a
+	inc de
+	ld [de], a
+	inc de
+
+	pop af
+	ldh [rSVBK], a
+	ret
+
 Unused_CheckShininess:
 ; Return carry if the DVs at hl are all 10 or higher.
 
@@ -1372,6 +1400,8 @@ SetFirstOBJPalette::
 	ld a, TRUE
  	ldh [hCGBPalUpdate], a
  	jp ApplyPals
+
+INCLUDE "gfx/type_pals.asm"
 
 INCLUDE "data/maps/environment_colors.asm"
 
