@@ -652,7 +652,7 @@ ENDC
 IF USE_GEN3_STYLE_TYPE_GFX == TRUE	
 	call .determine_paladdr ; pal 1, 2, 3, or 4
 	farcall LoadDexTypePals
-	call SetDefaultBGPAndOBP ; call SetPalettes
+	call SetPalettes ; call SetDefaultBGPAndOBP (8.0)
 	call DelayFrame
 ENDC
 
