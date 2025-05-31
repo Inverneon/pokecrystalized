@@ -2793,7 +2793,11 @@ wDudeNumBalls:: db
 wDudeBalls:: ds 2 * 4 + 1
 ENDU
 
-	ds 4
+wOtherTrainerType:: db
+wTrainerGroupBank:: db
+wRandomTrainerNumPokemon:: db
+wRandomTrainerTotalPokemon:: db
+wRandomTrainerRandomNumbers:: ds 6
 
 wd430:: ; mobile
 wBattleAction:: db
@@ -2805,7 +2809,6 @@ wMapEventStatus:: db
 wScriptFlags::
 ; bit 3: run deferred script
 	db
-	ds 1
 wEnabledPlayerEvents::
 ; bit 0: count steps
 ; bit 1: coord events
@@ -2821,7 +2824,6 @@ wScriptPos:: dw
 
 wScriptStackSize:: db
 wScriptStack:: ds 3 * 5
-	ds 1
 wScriptDelay:: db
 
 wDeferredScriptBank::
@@ -2830,14 +2832,12 @@ wScriptTextBank::
 wDeferredScriptAddr::
 wScriptTextAddr::
 	dw
-	ds 1
 wWildEncounterCooldown:: db
 
 wXYComparePointer:: dw
 	ds 4
 
 wBattleScriptFlags:: db
-	ds 1
 wPlayerSpriteSetupFlags::
 ; bit 7: if set, cancel wPlayerAction
 ; bit 6: RefreshMapSprites doesn't reload player sprite
@@ -2850,7 +2850,6 @@ wMapReentryScriptQueueFlag:: db
 wMapReentryScriptBank:: db
 wMapReentryScriptAddress:: dw
 
-	ds 4
 
 wTimeCyclesSinceLastCall:: db
 wReceiveCallDelay_MinsRemaining:: db
