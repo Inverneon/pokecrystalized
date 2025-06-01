@@ -480,8 +480,7 @@ AideScript_GivePotion:
 	writetext AideText_AlwaysBusy
 	waitbutton
 	closetext
-	setscene SCENE_ELMSLAB_NOOP
-	end
+	setscene SCENE_ELMSLAB_NOOP  
 
 AideScript_WalkBalls1:
 	applymovement ELMSLAB_ELMS_AIDE, AideWalksRight1
