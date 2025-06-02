@@ -472,7 +472,7 @@ AideScript_WalkPotion2:
 
 AideScript_GivePotion:
 	setflag ENGINE_POKEDEX
-	givepoke PARASECT, 5
+	givepoke ONIX, 5
 	opentext
 	writetext AideText_GiveYouPotion
 	promptbutton
