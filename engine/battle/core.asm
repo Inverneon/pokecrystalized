@@ -2179,95 +2179,27 @@ UpdateBattleStateAndExperienceAfterEnemyFaint:
 	ld a, [wBattleResult]
 	and BATTLERESULT_BITMASK
 	ld [wBattleResult], a ; WIN
-	call IsAnyMonHoldingExpShare
-	jr z, .skip_exp
-	ld hl, wEnemyMonBaseStats
-	ld b, wEnemyMonEnd - wEnemyMonBaseStats
-.loop
-	srl [hl]
-	inc hl
-	dec b
-	jr nz, .loop
-
-.skip_exp
-	ld hl, wEnemyMonBaseStats
-	ld de, wBackupEnemyMonBaseStats
-	ld bc, wEnemyMonEnd - wEnemyMonBaseStats
-	call CopyBytes
-	xor a
-	ld [wGivingExperienceToExpShareHolders], a
+	; Preserve bits of non-fainted participants
+	ld a, [wBattleParticipantsNotFainted]
+	ld d, a
+	push de
 	call GiveExperiencePoints
-	call IsAnyMonHoldingExpShare
+	pop de
+	; If Exp. Share is ON, give 50% EXP to non-participants
+	ld a, [wExpShareToggle]
+	and a
 	ret z
+	ld hl, wEnemyMonBaseExp
+	srl [hl]
 
 	ld a, [wBattleParticipantsNotFainted]
 	push af
 	ld a, d
+	xor %00111111
 	ld [wBattleParticipantsNotFainted], a
-	ld hl, wBackupEnemyMonBaseStats
-	ld de, wEnemyMonBaseStats
-	ld bc, wEnemyMonEnd - wEnemyMonBaseStats
-	call CopyBytes
-	ld a, $1
-	ld [wGivingExperienceToExpShareHolders], a
 	call GiveExperiencePoints
 	pop af
 	ld [wBattleParticipantsNotFainted], a
-	ret
-
-IsAnyMonHoldingExpShare:
-	ld a, [wPartyCount]
-	ld b, a
-	ld hl, wPartyMon1
-	ld c, 1
-	ld d, 0
-.loop
-	push hl
-	push bc
-	ld bc, MON_HP
-	add hl, bc
-	ld a, [hli]
-	or [hl]
-	pop bc
-	pop hl
-	jr z, .next
-
-	push hl
-	push bc
-	ld bc, MON_ITEM
-	add hl, bc
-	pop bc
-	ld a, [hl]
-	pop hl
-
-	cp EXP_SHARE
-	jr nz, .next
-	ld a, d
-	or c
-	ld d, a
-
-.next
-	sla c
-	push de
-	ld de, PARTYMON_STRUCT_LENGTH
-	add hl, de
-	pop de
-	dec b
-	jr nz, .loop
-
-	ld a, d
-	ld e, 0
-	ld b, PARTY_LENGTH
-.loop2
-	srl a
-	jr nc, .okay
-	inc e
-
-.okay
-	dec b
-	jr nz, .loop2
-	ld a, e
-	and a
 	ret
 
 StopDangerSound:
@@ -2586,10 +2518,6 @@ PlayVictoryMusic:
 	ld a, [wBattleMode]
 	dec a
 	jr nz, .trainer_victory
-	push de
-	call IsAnyMonHoldingExpShare
-	pop de
-	jr nz, .play_music
 	ld hl, wPayDayMoney
 	ld a, [hli]
 	or [hl]
@@ -7050,7 +6978,6 @@ GiveExperiencePoints:
 	bit 0, a
 	ret nz
 
-	call .EvenlyDivideExpAmongParticipants
 	xor a
 	ld [wCurPartyMon], a
 	ld bc, wPartyMon1Species
@@ -7128,6 +7055,17 @@ GiveExperiencePoints:
 	inc de
 	dec c
 	jr nz, .stat_exp_loop
+	pop bc
+	ld hl, MON_LEVEL
+	add hl, bc
+	ld a, [wLevelCap]
+	push bc
+	ld b, a
+	ld a, [hl]
+	cp b
+	pop bc
+	jp nc, .next_mon
+	push bc
 	xor a
 	ldh [hMultiplicand + 0], a
 	ldh [hMultiplicand + 1], a
@@ -7217,7 +7155,8 @@ GiveExperiencePoints:
 	ld [wCurSpecies], a
 	call GetBaseData
 	push bc
-	ld d, MAX_LEVEL
+	ld a, [wLevelCap]
+	ld d, a
 	callfar CalcExpAtLevel
 	pop bc
 	ld hl, MON_EXP + 2
@@ -7252,8 +7191,12 @@ GiveExperiencePoints:
 	pop bc
 	ld hl, MON_LEVEL
 	add hl, bc
+	ld a, [wLevelCap]
+	push bc
+	ld b, a
 	ld a, [hl]
-	cp MAX_LEVEL
+	cp b
+	pop bc
 	jp nc, .next_mon
 	cp d
 	jp z, .next_mon
@@ -7419,40 +7362,6 @@ GiveExperiencePoints:
 .done
 	jp ResetBattleParticipants
 
-.EvenlyDivideExpAmongParticipants:
-; count number of battle participants
-	ld a, [wBattleParticipantsNotFainted]
-	ld b, a
-	ld c, PARTY_LENGTH
-	ld d, 0
-.count_loop
-	xor a
-	srl b
-	adc d
-	ld d, a
-	dec c
-	jr nz, .count_loop
-	cp 2
-	ret c
-
-	ld [wTempByteValue], a
-	ld hl, wEnemyMonBaseStats
-	ld c, wEnemyMonEnd - wEnemyMonBaseStats
-.base_stat_division_loop
-	xor a
-	ldh [hDividend + 0], a
-	ld a, [hl]
-	ldh [hDividend + 1], a
-	ld a, [wTempByteValue]
-	ldh [hDivisor], a
-	ld b, 2
-	call Divide
-	ldh a, [hQuotient + 3]
-	ld [hli], a
-	dec c
-	jr nz, .base_stat_division_loop
-	ret
-
 BoostExp:
 ; Multiply experience by 1.5x
 	push bc
@@ -7500,8 +7409,12 @@ AnimateExpBar:
 	cp [hl]
 	jp nz, .finish
 
+	ld a, [wLevelCap]
+	push bc
+	ld b, a
 	ld a, [wBattleMonLevel]
-	cp MAX_LEVEL
+	cp b
+	pop bc
 	jp nc, .finish
 
 	ldh a, [hProduct + 3]
@@ -7538,7 +7451,8 @@ AnimateExpBar:
 	ld [hl], a
 
 .NoOverflow:
-	ld d, MAX_LEVEL
+	ld a, [wLevelCap]
+	ld d, a
 	callfar CalcExpAtLevel
 	ldh a, [hProduct + 1]
 	ld b, a
@@ -7573,8 +7487,12 @@ AnimateExpBar:
 	ld d, a
 
 .LoopLevels:
+	ld a, [wLevelCap]
+	push bc
+	ld b, a
 	ld a, e
-	cp MAX_LEVEL
+	cp b
+	pop bc
 	jr nc, .FinishExpBar
 	cp d
 	jr z, .FinishExpBar

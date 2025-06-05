@@ -88,6 +88,7 @@ SageLiScript:
 	writetext SageLiAfterBattleText
 	waitbutton
 	closetext
+    loadmem wLevelCap, 18
 	end
 
 TrainerSageJin:

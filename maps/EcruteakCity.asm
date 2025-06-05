@@ -6,12 +6,19 @@
 	const ECRUTEAKCITY_FISHER
 	const ECRUTEAKCITY_YOUNGSTER
 	const ECRUTEAKCITY_GRAMPS3
+	const ECRUTEAKCITY_OFFICER
+	const ECRUTEAKCITY_OFFICER2
 
 EcruteakCity_MapScripts:
 	def_scene_scripts
-
+	scene_script OfficerDisappear 
 	def_callbacks
 	callback MAPCALLBACK_NEWMAP, EcruteakCityFlypointCallback
+
+OfficerDisappear:
+    disappear ECRUTEAKCITY_OFFICER
+    disappear ECRUTEAKCITY_OFFICER
+	end 
 
 EcruteakCityFlypointCallback:
 	setflag ENGINE_FLYPOINT_ECRUTEAK
@@ -87,6 +94,17 @@ EcruteakCityMartSign:
 
 EcruteakCityHiddenHyperPotion:
 	hiddenitem HYPER_POTION, EVENT_ECRUTEAK_CITY_HIDDEN_HYPER_POTION
+
+EcruteakCityOfferScript:
+	text "Sorry Kid"
+
+	para "A heard of"
+	line "Tauros is"
+
+	para "moving through"
+	line "so we blocked"
+
+	para "Off the Route"
 
 UnusedMissingDaughterText: ; unreferenced
 	text "Oh, no. Oh, no…"
@@ -296,3 +314,5 @@ EcruteakCity_MapEvents:
 	object_event  9, 22, SPRITE_FISHER, SPRITEMOVEDATA_WALK_LEFT_RIGHT, 1, 0, -1, -1, PAL_NPC_GREEN, OBJECTTYPE_SCRIPT, 0, EcruteakCityFisherScript, -1
 	object_event 10, 14, SPRITE_YOUNGSTER, SPRITEMOVEDATA_WANDER, 1, 1, -1, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, EcruteakCityYoungsterScript, -1
 	object_event  3,  7, SPRITE_GRAMPS, SPRITEMOVEDATA_WANDER, 1, 1, -1, -1, PAL_NPC_GREEN, OBJECTTYPE_SCRIPT, 0, EcruteakCityGramps3Script, EVENT_ECRUTEAK_CITY_GRAMPS
+	object_event  3,  8, SPRITE_OFFICER, SPRITEMOVEDATA_STANDING_RIGHT, 1, 1, -1, -1, PAL_NPC_BLUE, OBJECTTYPE_SCRIPT, 0, EcruteakCityOfferScript, -1
+    object_event  3,  9, SPRITE_OFFICER, SPRITEMOVEDATA_STANDING_RIGHT, 1, 1, -1, -1, PAL_NPC_BLUE, OBJECTTYPE_SCRIPT, 0, EcruteakCityOfferScript, -1

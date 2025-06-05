@@ -1470,6 +1470,7 @@ FlameWheel:
 	stab
 	damagevariation
 	checkhit
+	speedup
 	effectchance
 	moveanim
 	failuretext

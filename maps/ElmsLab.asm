@@ -472,7 +472,7 @@ AideScript_WalkPotion2:
 
 AideScript_GivePotion:
 	setflag ENGINE_POKEDEX
-	givepoke ONIX, 5
+	givepoke CLEFABLE, 5
 	opentext
 	writetext AideText_GiveYouPotion
 	promptbutton
@@ -503,6 +503,7 @@ AideScript_GiveYouBalls:
 	getitemname STRING_BUFFER_4, POKE_BALL
 	scall AideScript_ReceiveTheBalls
 	giveitem POKE_BALL, 5
+	giveitem EXP_SHARE, 1
 	writetext AideText_ExplainBalls
 	promptbutton
 	itemnotify

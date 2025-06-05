@@ -7,12 +7,17 @@
 	const VIOLETCITY_FRUIT_TREE
 	const VIOLETCITY_POKE_BALL1
 	const VIOLETCITY_POKE_BALL2
+	const VIOLETCITY_YOUNGSTER2
 
 VioletCity_MapScripts:
 	def_scene_scripts
-
+	scene_script YoungsterDisappear 
 	def_callbacks
 	callback MAPCALLBACK_NEWMAP, VioletCityFlypointCallback
+
+YoungsterDisappear:
+    disappear VIOLETCITY_YOUNGSTER2
+	end 
 
 VioletCityFlypointCallback:
 	setflag ENGINE_FLYPOINT_VIOLET
@@ -47,7 +52,7 @@ VioletCityEarlScript:
 	opentext
 	writetext Text_HereTeacherIAm
 	waitbutton
-	closetext
+	closetext 
 	applymovement VIOLETCITY_EARL, VioletCitySpinningEarl_MovementData
 	applymovement VIOLETCITY_EARL, VioletCityFinishFollowEarl_MovementData
 	playsound SFX_ENTER_DOOR
@@ -55,6 +60,12 @@ VioletCityEarlScript:
 	clearevent EVENT_EARLS_ACADEMY_EARL
 	waitsfx
 	end
+
+VioletCityYoungsterScript2:
+   opentext
+   writetext Text_FalknerIsAway
+   waitbutton
+   closetext
 
 VioletCityLassScript:
 	jumptextfaceplayer VioletCityLassText
@@ -176,6 +187,10 @@ VioletCitySpinningEarl_MovementData:
 	turn_head RIGHT
 	turn_head DOWN
 	step_end
+
+Text_FalknerIsAway:
+    text "Sorry but"
+	line "FALKNER isn't here"
 
 Text_EarlAsksIfYouBeatFalkner:
 	text "Hello!"
@@ -305,8 +320,9 @@ VioletCity_MapEvents:
 	object_event 13, 16, SPRITE_FISHER, SPRITEMOVEDATA_SPINRANDOM_SLOW, 0, 0, -1, -1, PAL_NPC_GREEN, OBJECTTYPE_SCRIPT, 0, VioletCityEarlScript, EVENT_VIOLET_CITY_EARL
 	object_event 28, 28, SPRITE_LASS, SPRITEMOVEDATA_WANDER, 2, 2, -1, -1, PAL_NPC_GREEN, OBJECTTYPE_SCRIPT, 0, VioletCityLassScript, -1
 	object_event 24, 14, SPRITE_SUPER_NERD, SPRITEMOVEDATA_WANDER, 1, 2, -1, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, VioletCitySuperNerdScript, -1
-	object_event 17, 20, SPRITE_GRAMPS, SPRITEMOVEDATA_WALK_LEFT_RIGHT, 1, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, VioletCityGrampsScript, -1
+	object_event 17, 20, SPRITE_GRAMPS, SPRITEMOVEDATA_WALK_LEFT_RIGHT, 1, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, VioletCityGrampsScript, -10
 	object_event  5, 18, SPRITE_YOUNGSTER, SPRITEMOVEDATA_SPINRANDOM_SLOW, 0, 0, -1, -1, PAL_NPC_GREEN, OBJECTTYPE_SCRIPT, 0, VioletCityYoungsterScript, -1
 	object_event 14, 29, SPRITE_FRUIT_TREE, SPRITEMOVEDATA_STILL, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, VioletCityFruitTree, -1
 	object_event  4,  1, SPRITE_POKE_BALL, SPRITEMOVEDATA_STILL, 0, 0, -1, -1, 0, OBJECTTYPE_ITEMBALL, 0, VioletCityPPUp, EVENT_VIOLET_CITY_PP_UP
 	object_event 35,  5, SPRITE_POKE_BALL, SPRITEMOVEDATA_STILL, 0, 0, -1, -1, 0, OBJECTTYPE_ITEMBALL, 0, VioletCityRareCandy, EVENT_VIOLET_CITY_RARE_CANDY
+	object_event 18, 18, SPRITE_YOUNGSTER, SPRITEMOVEDATA_STANDING_DOWN, 1, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, VioletCityYoungsterScript2, -1
