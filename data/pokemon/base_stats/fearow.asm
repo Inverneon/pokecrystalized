@@ -1,6 +1,6 @@
 	db FEAROW ; 022
 
-	db  65,  90,  65, 100,  61,  61
+	db  85, 100,  95, 100,  61,  71
 	;   hp  atk  def  spd  sat  sdf
 
 	db NORMAL, FLYING ; type
