@@ -1,6 +1,6 @@
 	db PHANPY ; 231
 
-	db  90,  60,  60,  40,  40,  40
+	db  90,  70,  70,  40,  40,  50
 	;   hp  atk  def  spd  sat  sdf
 
 	db GROUND, GROUND ; type
