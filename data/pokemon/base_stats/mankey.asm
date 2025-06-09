@@ -1,6 +1,6 @@
 	db MANKEY ; 056
 
-	db  40,  80,  35,  70,  35,  45
+	db  60,  80,  45,  70,  35,  55
 	;   hp  atk  def  spd  sat  sdf
 
 	db FIGHTING, FIGHTING ; type
