@@ -31,6 +31,7 @@ AzaleaGymBugsyScript:
 	waitsfx
 	setflag ENGINE_HIVEBADGE
 	readvar VAR_BADGES
+	loadmem wLevelCap, 24
 	scall AzaleaGymActivateRockets
 .FightDone:
 	checkevent EVENT_GOT_TM49_FURY_CUTTER

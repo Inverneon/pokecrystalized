@@ -472,7 +472,10 @@ AideScript_WalkPotion2:
 
 AideScript_GivePotion:
 	setflag ENGINE_POKEDEX
-	givepoke CLEFABLE, 5
+	givepoke JYNX, 5
+	givepoke SUNFLORA, 5
+	givepoke UNOWN, 5
+	givepoke HITMONLEE, 5
 	opentext
 	writetext AideText_GiveYouPotion
 	promptbutton

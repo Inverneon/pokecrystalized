@@ -6,5 +6,6 @@ CriticalHitMoves:
 	db SLASH
 	db AEROBLAST
 	db CROSS_CHOP
-	db VINE_WHIP
+	db VICEGRIP
+	db CUT
 	db -1
