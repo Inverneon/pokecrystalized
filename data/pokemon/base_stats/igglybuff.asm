@@ -1,6 +1,6 @@
 	db IGGLYBUFF ; 174
 
-	db  90,  30,  15,  15,  40,  20
+	db  90,  80,  77,  70,  50,  50
 	;   hp  atk  def  spd  sat  sdf
 
 	db FLYING, FAIRY ; type

@@ -1,6 +1,6 @@
 	db CLEFAIRY ; 035
 
-	db  70,  45,  48,  35,  60,  65
+	db  70,  65,  78,  35,  70,  95
 	;   hp  atk  def  spd  sat  sdf
 
 	db FAIRY, FAIRY ; type

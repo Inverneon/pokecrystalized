@@ -1,6 +1,6 @@
 	db CLEFFA ; 173
 
-	db  50,  25,  28,  15,  45,  55
+	db  50,  55,  48,  45,  65,  75
 	;   hp  atk  def  spd  sat  sdf
 
 	db FAIRY, FAIRY ; type

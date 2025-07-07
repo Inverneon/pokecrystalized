@@ -1,6 +1,6 @@
 	db JOLTEON ; 135
 
-	db  65,  65,  60, 130, 110,  95
+	db  65, 100,  60, 130, 120,  95
 	;   hp  atk  def  spd  sat  sdf
 
 	db ELECTRIC, ELECTRIC ; type

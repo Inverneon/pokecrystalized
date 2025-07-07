@@ -1,6 +1,6 @@
 	db LEDIAN ; 166
 
-	db  65,  90,  70,  85,  55, 110
+	db  85,  95,  80,  85, 105, 110
 	;   hp  atk  def  spd  sat  sdf
 
 	db BUG, FAIRY ; type

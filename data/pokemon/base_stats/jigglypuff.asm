@@ -1,6 +1,6 @@
 	db JIGGLYPUFF ; 039
 
-	db 115,  45,  20,  20,  45,  25
+	db 115,  95,  99,  90,  75,  65
 	;   hp  atk  def  spd  sat  sdf
 
 	db FLYING, FAIRY ; type
